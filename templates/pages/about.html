@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="terminal-page-header">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+    <div>
+      <p class="panel-kicker">SYSTEM // INFORMATION</p>
+      <h1>ABOUT D-OS</h1>
+      <p class="muted" style="margin-top: 0.25rem;">MONEY OPERATING SYSTEM</p>
+    </div>
+    <a href="/more" class="dos-btn ghost" style="font-size: 1rem; padding: 0.35rem 0.75rem;">← Back to More</a>
+  </div>
+  <div class="ascii-divider" aria-hidden="true">──────────────────────────────────────────────────────────────────────────────────────────</div>
+</div>
+
+<section class="terminal-panel" style="max-width: 680px;">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">SYSTEM SPECIFICATION</p>
+      <h2>D-OS</h2>
+      <p class="panel-kicker" style="color: var(--green); font-size: 1.1rem; margin-top: 0.25rem;">MONEY OPERATING SYSTEM</p>
+    </div>
+  </div>
+  <div style="display: grid; gap: 1.25rem;">
+    <p>D-OS is your personal Money Operating System. Track every rupee — expenses, income, budgets, goals, recurring payments and lending — all from one terminal-inspired dashboard.</p>
+    
+    <div style="border: 1px solid var(--line); border-radius: 4px; padding: 1rem; background: rgba(3, 13, 6, 0.6);">
+      <p class="panel-kicker" style="margin-bottom: 0.5rem;">CORE ARCHITECTURE</p>
+      <dl class="goal-stats-grid">
+        <div><dt>Version</dt><dd>1.0.0</dd></div>
+        <div><dt>Stack</dt><dd>FastAPI + Firestore</dd></div>
+        <div><dt>Frontend</dt><dd>Jinja2 + HTMX + Chart.js</dd></div>
+        <div><dt>Design</dt><dd>CRT Phosphor Green Terminal</dd></div>
+      </dl>
+    </div>
+
+    <!-- Product Authorship & Copyright Section -->
+    <div style="border: 1px solid var(--line); border-radius: 4px; padding: 1.5rem; background: rgba(3, 13, 6, 0.75); text-align: center;">
+      <p class="panel-kicker" style="margin-bottom: 0.75rem;">PRODUCT AUTHORSHIP</p>
+      <div style="font-size: 1.8rem; font-weight: 700; color: var(--green); letter-spacing: 0.08em; line-height: 1.1;">D-OS</div>
+      <div style="font-size: 1rem; color: var(--green-dim); letter-spacing: 0.16em; margin-bottom: 1rem; font-weight: 500;">MONEY OPERATING SYSTEM</div>
+      <div style="color: var(--muted); font-size: 1.1rem; margin-bottom: 1rem;">Version 1.0.0</div>
+      
+      <div style="color: var(--muted); font-size: 1.05rem;">Designed &amp; Developed by</div>
+      <div style="font-size: 1.4rem; font-weight: 700; color: #ffffff; letter-spacing: 0.08em; margin: 0.25rem 0 1rem;">DAIVIK A.D.</div>
+      
+      <div class="ascii-divider" style="margin: 0.75rem auto 1rem; max-width: 260px;" aria-hidden="true">────────────────────────</div>
+      <div style="font-size: 1rem; color: var(--green-dim);">© 2026 Daivik A.D. All rights reserved.</div>
+    </div>
+
+    <a href="/more" class="dos-btn ghost" style="justify-self: start;">← Back to More</a>
+  </div>
+</section>
+{% endblock %}

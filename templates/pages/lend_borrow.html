@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="terminal-page-header">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+    <div>
+      <p class="panel-kicker">MONEY TRACKING // DEBTS &amp; CREDITS</p>
+      <h1>LEND &amp; BORROW</h1>
+      <p class="muted" style="margin-top: 0.25rem;">Track money you have lent to or borrowed from other people.</p>
+    </div>
+    <a href="/more" class="dos-btn ghost" style="font-size: 1rem; padding: 0.35rem 0.75rem;">← Back to More</a>
+  </div>
+  <div class="ascii-divider" aria-hidden="true">──────────────────────────────────────────────────────────────────────────────────────────</div>
+</div>
+
+<section class="metric-grid compact">
+  <article class="metric"><span>Need To Receive</span><strong>{{ receive|money(current_user.currency) }}</strong></article>
+  <article class="metric"><span>Need To Pay</span><strong>{{ pay|money(current_user.currency) }}</strong></article>
+</section>
+
+<section class="terminal-panel" style="margin-top: 1.25rem;">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">NEW ENTRY</p>
+      <h2>Record debt or credit</h2>
+    </div>
+  </div>
+
+  <form class="transaction-form" method="post" action="/lend-borrow" data-op-name="RECORDING DEBT / CREDIT...">
+    <label>Type
+      <select name="direction">
+        <option value="lend">Money Given (I Lent)</option>
+        <option value="borrow">Money Taken (I Borrowed)</option>
+      </select>
+    </label>
+    <label>Person Name
+      <input name="person_name" required placeholder="Friend, colleague, relative...">
+    </label>
+    <label>Phone
+      <input name="phone" placeholder="+91">
+    </label>
+    <label>Amount ({{ current_user.currency if current_user else "₹" }})
+      <input name="amount" type="number" min="0.01" step="any" required placeholder="1000.00">
+    </label>
+    <label>Due Date
+      <input name="due_date" type="date">
+    </label>
+    <label>Status
+      <select name="status">
+        <option value="pending">Pending</option>
+        <option value="paid">Settled / Paid</option>
+      </select>
+    </label>
+    <label>Note / Purpose
+      <input name="note" placeholder="Trip split, dinner, loan...">
+    </label>
+    <button class="terminal-button" type="submit">+ Save Record</button>
+  </form>
+</section>
+
+<section class="terminal-panel" style="margin-top: 1.25rem;">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">LEDGER</p>
+      <h2>Active Records ({{ debts|length }})</h2>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="terminal-table">
+      <thead>
+        <tr>
+          <th>Person</th>
+          <th>Phone</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for debt in debts %}
+        <tr>
+          <td><strong>{{ debt.person_name }}</strong>{% if debt.note %}<small style="display:block; color: var(--muted);">{{ debt.note }}</small>{% endif %}</td>
+          <td>{{ debt.phone or '—' }}</td>
+          <td><span class="pill {{ 'income' if debt.direction == 'lend' else 'expense' }}">{{ 'LENT' if debt.direction == 'lend' else 'BORROWED' }}</span></td>
+          <td><strong style="color: #ffffff;">{{ debt.amount|money(current_user.currency) }}</strong></td>
+          <td>{{ debt.due_date|format_date if debt.due_date else '—' }}</td>
+          <td>
+            <form method="post" action="/lend-borrow/{{ debt.id }}/status" class="inline-form">
+              <select name="status">
+                <option value="pending" {% if debt.status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="paid" {% if debt.status == 'paid' %}selected{% endif %}>Paid</option>
+              </select>
+              <button class="dos-btn ghost" style="padding: 0.2rem 0.5rem; font-size: 0.9rem;">Save</button>
+            </form>
+          </td>
+          <td>
+            <form method="post" action="/lend-borrow/{{ debt.id }}/delete" onsubmit="return confirm('Delete this record?');">
+              <button class="link-danger" type="submit" title="Delete record">⌫</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="empty-cell">
+            <div class="chart-empty-state" style="min-height: 120px; border: none; padding: 1.5rem 0;">
+              <p class="panel-kicker">NO LEND OR BORROW RECORDS</p>
+              <p class="muted">Track money you have given to or taken from people using the form above.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

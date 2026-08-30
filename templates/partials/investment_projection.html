@@ -1,0 +1,8 @@
+<div class="mini-projection">
+  <div class="metric-grid compact">
+    <article class="metric"><span>Final Value</span><strong>{{ result.final_value|money(current_user.currency) }}</strong></article>
+    <article class="metric"><span>Interest Earned</span><strong>{{ result.interest_earned|money(current_user.currency) }}</strong></article>
+    <article class="metric"><span>Total Invested</span><strong>{{ result.total_invested|money(current_user.currency) }}</strong></article>
+  </div>
+  <canvas data-chart="line" data-x-title="Year" data-y-title="Projected Value ({{ current_user.currency }})" data-payload='{"labels": {{ result.series|map(attribute="label")|list|tojson }}, "values": {{ result.series|map(attribute="value")|list|tojson }} }'></canvas>
+</div>

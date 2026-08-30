@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="terminal-page-header">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+    <div>
+      <p class="panel-kicker">SYSTEM // LOCAL DOCUMENTATION</p>
+      <h1>HELP CENTER</h1>
+      <p class="muted" style="margin-top: 0.25rem;">Local documentation, feature guides and system answers.</p>
+    </div>
+    <a href="/more" class="dos-btn ghost" style="font-size: 1rem; padding: 0.35rem 0.75rem;">← Back to More</a>
+  </div>
+  <div class="ascii-divider" aria-hidden="true">──────────────────────────────────────────────────────────────────────────────────────────</div>
+</div>
+
+<section class="help-center">
+  <div class="help-search-bar">
+    <input type="search" id="help-search-input" placeholder="Search D-OS Help (e.g. budget, expense, goals, recurring)..." autocomplete="off">
+  </div>
+
+  <div id="help-articles">
+
+    <!-- 1. GETTING STARTED -->
+    <div class="help-section" data-help-section>
+      <h2 class="help-section-title">GETTING STARTED</h2>
+
+      <details class="help-article" data-help-article>
+        <summary>What is D-OS?</summary>
+        <div class="help-answer">
+          <p>D-OS (D-OS Money Operating System) is your personal finance command center. It helps you track expenses, income, real monthly budgets, isolated custom budgets, savings goals, recurring payments, and lending — all from a single terminal-inspired dashboard. Designed &amp; Developed by Daivik A.D.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>Dashboard overview</summary>
+        <div class="help-answer">
+          <p>The Dashboard displays your core financial snapshot: today's expenses, monthly spending, savings, remaining budget, active goals, and money to receive or pay. It also features a real-time Income vs Expense chart and financial alerts.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>Adding your first transaction</summary>
+        <div class="help-answer">
+          <p>Tap the central <strong>+ Add</strong> button in the bottom navigation (mobile) or the <strong>+ Record</strong> button in the top navigation (desktop). Choose Expense or Income, select a category, enter an amount and date, then submit. Quick Amount shortcuts (₹100, ₹200, ₹500, ₹1000, ₹2000, ₹5000) are available for fast entry.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- 2. MONEY -->
+    <div class="help-section" data-help-section>
+      <h2 class="help-section-title">MONEY</h2>
+
+      <details class="help-article" data-help-article>
+        <summary>How do I add an expense?</summary>
+        <div class="help-answer">
+          <p>Navigate to Transactions (`/money`) or tap the + Add button. Select <strong>- Expense</strong>, choose an expense category (Food, Fuel, Bills, Shopping, Rent, Travel, Health, Other), enter the amount, select the transaction date, and tap <strong>Record Expense</strong>.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>Recording income</summary>
+        <div class="help-answer">
+          <p>Go to Transactions or tap + Add. Select <strong>+ Income</strong>, choose an income category (Salary, Business, Freelance, Investment, Other), enter the amount and date, then tap <strong>Record Income</strong>.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>Editing or deleting a transaction</summary>
+        <div class="help-answer">
+          <p>Go to the Transactions Ledger (`/money`). In the transaction history table, each entry provides an edit (✎) and delete (⌫) action. You can update the amount, date, payment method, category, or note at any time.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- 3. BUDGETING -->
+    <div class="help-section" data-help-section>
+      <h2 class="help-section-title">BUDGETING</h2>
+
+      <details class="help-article" data-help-article>
+        <summary>What is a budget?</summary>
+        <div class="help-answer">
+          <p>A budget is the total spending ceiling you establish for a calendar month. D-OS compares your real-time expenses against this target, calculates your remaining allowance, and computes your recommended daily spending limit.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>What are custom budgets?</summary>
+        <div class="help-answer">
+          <p>Custom Budgets are dedicated financial planners for separate events or projects — like a Goa Trip (₹15,000), Wedding Shopping (₹35,000), or a festival celebration. They let you log project expenses into an isolated ledger.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>Do custom budgets affect my monthly budget?</summary>
+        <div class="help-answer">
+          <p><strong>No.</strong> Custom Budgets operate in a strictly isolated event universe. Expenses logged inside a Custom Budget never increase your monthly spending metric, never decrease your monthly remaining budget, and never alter your primary Ledger cash flow.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- 4. GOALS -->
+    <div class="help-section" data-help-section>
+      <h2 class="help-section-title">GOALS</h2>
+
+      <details class="help-article" data-help-article>
+        <summary>What are goals?</summary>
+        <div class="help-answer">
+          <p>Goals help you track money you are intentionally saving toward a specific target — such as a Himalayan bike purchase, a vacation fund, or emergency savings. D-OS automatically calculates the daily, weekly, and monthly saving pace required to achieve your target date.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>How do I add money to a goal?</summary>
+        <div class="help-answer">
+          <p>Navigate to Goals (`/goals`). On any active goal card, enter the amount saved in the "Add Funds" form and submit. The progress percentage and remaining balance update immediately.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- 5. ANALYTICS -->
+    <div class="help-section" data-help-section>
+      <h2 class="help-section-title">ANALYTICS</h2>
+
+      <details class="help-article" data-help-article>
+        <summary>What is Analytics?</summary>
+        <div class="help-answer">
+          <p>Analytics (`/visualize`) delivers visual reporting of your financial data: Monthly Income vs Expense comparison, Expense Allocation by category, Savings Trajectory, Monthly Budget Progress, Cumulative Cash Flow, and Goal Completion progress.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>Why do some charts show "No Data Available"?</summary>
+        <div class="help-answer">
+          <p>Charts require at least one recorded transaction to generate meaningful visualizations. Once you record transactions in the Ledger, each visualization populates automatically with real-time data.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- 6. RECURRING PAYMENTS -->
+    <div class="help-section" data-help-section>
+      <h2 class="help-section-title">RECURRING PAYMENTS</h2>
+
+      <details class="help-article" data-help-article>
+        <summary>What are recurring payments?</summary>
+        <div class="help-answer">
+          <p>Recurring Payments let you monitor subscriptions, rent, utility bills, and insurance premiums. Access them via <strong>More → Recurring Payments</strong> (`/recurring`) to schedule reminders for upcoming obligations.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>Does D-OS automatically create recurring transactions?</summary>
+        <div class="help-answer">
+          <p><strong>No.</strong> D-OS tracks recurring payments strictly as scheduled obligations and reminders so you know what is due. You record the actual payment manually in the Ledger when the payment is made, ensuring full control over your financial records.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- 7. LEND & BORROW -->
+    <div class="help-section" data-help-section>
+      <h2 class="help-section-title">LEND &amp; BORROW</h2>
+
+      <details class="help-article" data-help-article>
+        <summary>How do I use Lend &amp; Borrow?</summary>
+        <div class="help-answer">
+          <p>Navigate to <strong>More → Lend &amp; Borrow</strong> (`/lend-borrow`). Select "Money Given (I Lent)" if someone owes you money, or "Money Taken (I Borrowed)" if you owe someone. Enter the person's name, amount, and due date. Mark the record as "Paid" once settled.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- 8. SYSTEM -->
+    <div class="help-section" data-help-section>
+      <h2 class="help-section-title">SYSTEM</h2>
+
+      <details class="help-article" data-help-article>
+        <summary>How do I access Settings?</summary>
+        <div class="help-answer">
+          <p>Settings is accessible directly from the <strong>⚙ gear icon</strong> in the header bar. You can update your display name, currency symbol, password, and manage custom categories with monthly limits.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>How does the loading indicator work?</summary>
+        <div class="help-answer">
+          <p>D-OS shows real-time loading feedback using indeterminate CRT scanning [████░░░░░░░░] during genuine server operations (e.g. `[SAVING EXPENSE...]`, `[DELETING...]`). If an operation takes longer than 2.5 seconds, it notifies you that the request is taking longer than expected. D-OS never uses fake percentages.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>Why does D-OS show offline?</summary>
+        <div class="help-answer">
+          <p>D-OS monitors your network connectivity in real time. If your internet connection drops, D-OS displays "OFFLINE // NO NETWORK CONNECTION DETECTED" until connectivity is restored.</p>
+        </div>
+      </details>
+
+      <details class="help-article" data-help-article>
+        <summary>How do I logout?</summary>
+        <div class="help-answer">
+          <p>You can end your session anytime via the ⏻ logout button in the top navigation bar, inside <strong>More → Logout</strong>, or inside <strong>Settings → Session → Logout</strong>.</p>
+        </div>
+      </details>
+    </div>
+
+  </div>
+
+  <div id="help-no-results" class="help-no-results" style="display: none;">
+    <p class="panel-kicker">NO MATCHING ARTICLES</p>
+    <p class="muted">Try a different search term (e.g. budget, expense, goals, recurring, logout).</p>
+  </div>
+</section>
+{% endblock %}

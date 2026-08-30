@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="terminal-page-header">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+    <div>
+      <p class="panel-kicker">PLANNING // FINANCIAL TARGETS</p>
+      <h1>GOALS</h1>
+      <p class="muted" style="margin-top: 0.25rem;">Track money you are intentionally saving toward a target.</p>
+    </div>
+    <a href="/more" class="dos-btn ghost" style="font-size: 1rem; padding: 0.35rem 0.75rem;">← Back to More</a>
+  </div>
+  <div class="ascii-divider" aria-hidden="true">──────────────────────────────────────────────────────────────────────────────────────────</div>
+</div>
+
+<!-- Goal Creation Panel -->
+<section class="terminal-panel">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">Planner</p>
+      <h2>Create New Goal</h2>
+    </div>
+  </div>
+  <form class="transaction-form" method="post" action="/goals">
+    <label>Goal Name
+      <input name="name" placeholder="Bike, Car, House, Laptop, Phone, Vacation..." required>
+    </label>
+    <label>Target Amount
+      <input name="target_amount" type="number" min="0.01" step="any" placeholder="50000" required>
+    </label>
+    <label>Current Saved
+      <input name="current_saved" type="number" min="0" step="any" value="0">
+    </label>
+    <label>Target Date
+      <input name="target_date" type="date">
+    </label>
+    <button class="dos-btn primary" type="submit">Set Financial Goal</button>
+  </form>
+</section>
+
+<!-- Goals Grid -->
+<section class="goal-grid">
+  {% for goal in goals %}
+  <article class="goal-tile terminal-panel">
+    <div class="goal-header">
+      <div class="goal-header-title">
+        <span class="goal-svg-icon">{{ goal.svg_icon|safe }}</span>
+        <div>
+          <p class="panel-kicker">Target Date: {{ goal.estimated_completion }}</p>
+          <h2>{{ goal.name }}</h2>
+        </div>
+      </div>
+      <span class="status-badge {{ goal.status }}">{{ goal.status|upper }}</span>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="goal-progress-wrap">
+      <div class="progress-labels">
+        <span>Progress ({{ goal.progress|pct }})</span>
+        <span>Saved: {{ goal.current_saved|money(current_user.currency) }} / {{ goal.target_amount|money(current_user.currency) }}</span>
+      </div>
+      <progress max="100" value="{{ goal.progress }}"></progress>
+    </div>
+
+    <!-- Metrics Breakdown Table -->
+    <dl class="goal-stats-grid">
+      <div><dt>Target Amount</dt><dd>{{ goal.target_amount|money(current_user.currency) }}</dd></div>
+      <div><dt>Current Saved</dt><dd>{{ goal.current_saved|money(current_user.currency) }}</dd></div>
+      <div><dt>Remaining</dt><dd>{{ goal.remaining|money(current_user.currency) }}</dd></div>
+      <div><dt>Daily Saved Required</dt><dd>{{ goal.daily|money(current_user.currency) }}/day</dd></div>
+      <div><dt>Weekly Pace</dt><dd>{{ goal.weekly|money(current_user.currency) }}/wk</dd></div>
+      <div><dt>Monthly Pace</dt><dd>{{ goal.monthly|money(current_user.currency) }}/mo</dd></div>
+      <div><dt>Estimated Completion</dt><dd>{{ goal.estimated_completion }}</dd></div>
+      <div><dt>Status</dt><dd>{{ goal.status|capitalize }}</dd></div>
+    </dl>
+
+    <!-- Actions -->
+    <div class="goal-actions">
+      <form class="inline-form" method="post" action="/goals/{{ goal.id }}/add-money">
+        <input name="amount" type="number" step="any" min="0.01" placeholder="Add saved amount">
+        <button class="dos-btn" type="submit">+ Add Funds</button>
+      </form>
+
+      <details class="edit-details">
+        <summary class="dos-btn ghost">Edit Parameters</summary>
+        <form class="edit-grid" method="post" action="/goals/{{ goal.id }}/update">
+          <label>Name
+            <input name="name" value="{{ goal.name }}" required>
+          </label>
+          <label>Target Amount
+            <input name="target_amount" type="number" min="0.01" step="any" value="{{ goal.target_amount }}" required>
+          </label>
+          <label>Current Saved
+            <input name="current_saved" type="number" min="0" step="any" value="{{ goal.current_saved }}" required>
+          </label>
+          <label>Target Date
+            <input name="target_date" type="date" value="{{ goal.target_date.isoformat() if goal.target_date.isoformat is defined else (goal.target_date or '') }}">
+          </label>
+          <label>Status
+            <select name="status">
+              <option value="active" {% if goal.status == 'active' %}selected{% endif %}>Active</option>
+              <option value="completed" {% if goal.status == 'completed' %}selected{% endif %}>Completed</option>
+              <option value="paused" {% if goal.status == 'paused' %}selected{% endif %}>Paused</option>
+            </select>
+          </label>
+          <button class="dos-btn primary" type="submit">Save Changes</button>
+        </form>
+      </details>
+
+      <form method="post" action="/goals/{{ goal.id }}/delete" onsubmit="return confirm('Delete this goal?');">
+        <button class="link-danger" type="submit">Remove Goal</button>
+      </form>
+    </div>
+  </article>
+  {% else %}
+  <section class="terminal-panel">
+    <div class="chart-empty-state" style="min-height: 160px;">
+      <p class="panel-kicker">NO ACTIVE GOALS</p>
+      <p class="muted">Create a financial target and track your progress.</p>
+      <button type="button" class="dos-btn ghost" onclick="document.querySelector('.transaction-form input[name=name]').focus()" style="margin-top: 0.5rem;">+ CREATE GOAL</button>
+    </div>
+  </section>
+  {% endfor %}
+</section>
+{% endblock %}

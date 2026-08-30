@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="D OS logo">
+  <rect width="128" height="128" rx="18" fill="#020805"/>
+  <rect x="10" y="10" width="108" height="108" rx="12" fill="none" stroke="#39ff88" stroke-width="4"/>
+  <path d="M32 31h24c21 0 36 13 36 33S77 97 56 97H32V31Zm17 16v34h8c11 0 18-7 18-17s-7-17-18-17h-8Z" fill="#39ff88"/>
+  <circle cx="92" cy="36" r="9" fill="#33ccff"/>
+  <path d="M87 73h22v12H87zM87 91h22v6H87z" fill="#ff4fd8"/>
+</svg>
+

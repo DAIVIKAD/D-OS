@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="terminal-page-header">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+    <div>
+      <p class="panel-kicker">SYSTEM STATUS // FINANCIAL REPORT ENGINE</p>
+      <h1>REPORTS &amp; PDF</h1>
+      <p class="muted" style="margin-top: 0.25rem;">Monthly and category financial reports and CSV/PDF export.</p>
+    </div>
+    <a href="/more" class="dos-btn ghost" style="font-size: 1rem; padding: 0.35rem 0.75rem;">← Back to More</a>
+  </div>
+  <div class="ascii-divider" aria-hidden="true">──────────────────────────────────────────────────────────────────────────────────────────</div>
+</div>
+
+<section class="metric-grid compact">
+  <article class="metric"><span>Monthly Income</span><strong>{{ dashboard.monthly_income|money(current_user.currency) }}</strong></article>
+  <article class="metric"><span>Monthly Expense</span><strong>{{ dashboard.monthly_expense|money(current_user.currency) }}</strong></article>
+  <article class="metric"><span>Remaining Budget</span><strong>{{ dashboard.remaining_budget|money(current_user.currency) }}</strong></article>
+  <article class="metric"><span>Savings</span><strong>{{ dashboard.savings|money(current_user.currency) }}</strong></article>
+</section>
+
+<section class="dashboard-layout">
+  <article class="terminal-panel">
+    <div class="panel-head"><div><p class="panel-kicker">Exports</p><h2>Reports</h2></div></div>
+    <div class="quick-actions large">
+      <a href="/reports/export.csv" data-download data-op-name="EXPORTING MONEY CSV...">CSV Money</a>
+      <a href="/reports/export.csv?kind=income" data-download data-op-name="EXPORTING INCOME CSV...">CSV Income</a>
+      <a href="/reports/export.csv?kind=expense" data-download data-op-name="EXPORTING EXPENSE CSV...">CSV Expense</a>
+      <a href="/reports/export.pdf" data-download data-op-name="GENERATING PDF REPORT...">PDF Report</a>
+    </div>
+  </article>
+  <article class="terminal-panel">
+    <div class="panel-head"><div><p class="panel-kicker">Monthly</p><h2>Comparison</h2></div></div>
+    {% if not charts.monthly_comparison.has_data %}
+      <div class="chart-empty-state">
+        <p class="panel-kicker">INSUFFICIENT MONTHLY DATA</p>
+        <p class="muted">Record expenses in the Ledger to compare monthly spending.</p>
+      </div>
+    {% else %}
+      <canvas data-chart="bar" data-x-title="Month" data-y-title="Expense ({{ current_user.currency }})" data-payload='{{ charts.monthly_comparison|tojson }}'></canvas>
+    {% endif %}
+  </article>
+</section>
+
+<section class="chart-grid two">
+  <article class="terminal-panel chart-panel">
+    <div class="panel-head"><div><p class="panel-kicker">Yearly</p><h2>Expense Comparison</h2></div></div>
+    {% if not charts.yearly_comparison.has_data %}
+      <div class="chart-empty-state">
+        <p class="panel-kicker">NO YEARLY EXPENSE DATA</p>
+        <p class="muted">Yearly comparison appears after real expense records are available.</p>
+      </div>
+    {% else %}
+      <canvas data-chart="bar" data-x-title="Year" data-y-title="Expense ({{ current_user.currency }})" data-payload='{{ charts.yearly_comparison|tojson }}'></canvas>
+    {% endif %}
+  </article>
+  <article class="terminal-panel chart-panel">
+    <div class="panel-head"><div><p class="panel-kicker">Cash</p><h2>Monthly Net Cash Flow</h2></div></div>
+    {% if not charts.cash_flow.has_data %}
+      <div class="chart-empty-state">
+        <p class="panel-kicker">NO CASH FLOW DATA</p>
+        <p class="muted">Add income and expense records to generate net cash flow.</p>
+      </div>
+    {% else %}
+      <canvas data-chart="line" data-x-title="Month" data-y-title="Net Flow ({{ current_user.currency }})" data-payload='{{ charts.cash_flow|tojson }}'></canvas>
+    {% endif %}
+  </article>
+</section>
+{% endblock %}

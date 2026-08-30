@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="terminal-panel">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">LEDGER RECORD ENGINE</p>
+      <h2>NEW TRANSACTION</h2>
+    </div>
+  </div>
+  <form class="transaction-form-unified" method="post" action="/transactions" data-op-name="RECORDING TRANSACTION...">
+    <input type="hidden" name="type" value="{{ 'income' if kind == 'income' else 'expense' }}">
+
+    <div class="transaction-type-switcher" data-transaction-switcher style="margin-bottom: 1rem;">
+      <button type="button" class="type-toggle-btn {% if kind != 'income' %}active{% endif %}" data-type-btn="expense">- Expense</button>
+      <button type="button" class="type-toggle-btn {% if kind == 'income' %}active{% endif %}" data-type-btn="income">+ Income</button>
+    </div>
+
+    <!-- Visual Category Tiles Grid -->
+    <div class="category-visual-selector" data-category-selector style="margin-bottom: 1rem;">
+      <div class="category-tiles-grid">
+        {% for category in all_categories %}
+          <button type="button" class="category-tile-btn {% if loop.first %}active{% endif %}" data-cat-id="{{ category.id }}" data-kind="{{ category.kind }}" title="{{ category.name }}">
+            <span class="cat-icon-badge">{{ category.icon }}</span>
+            <span class="cat-name-label">{{ category.name }}</span>
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem;">
+      <label>Category
+        <select name="category_id" required>
+          {% for category in all_categories %}
+            <option value="{{ category.id }}" data-kind="{{ category.kind }}">{{ category.icon }} {{ category.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Amount ({{ current_user.currency if current_user else "₹" }})
+        <input name="amount" type="number" min="0.01" step="any" placeholder="0.00" required>
+      </label>
+      <label>Date
+        <input name="date" type="date" required>
+      </label>
+      <label>Payment Method
+        <input name="payment_method" placeholder="UPI, Cash, Card, Bank">
+      </label>
+      <label style="grid-column: 1 / -1;">Note / Reference
+        <input name="note" placeholder="Description or note">
+      </label>
+    </div>
+
+    <!-- Quick Amount Shortcuts -->
+    <div class="quick-amounts-bar" style="margin-top: 0.75rem;">
+      <span class="panel-kicker" style="font-size: 0.85rem;">QUICK AMOUNT:</span>
+      <button type="button" class="quick-amt-btn" data-quick-amount="100">₹100</button>
+      <button type="button" class="quick-amt-btn" data-quick-amount="200">₹200</button>
+      <button type="button" class="quick-amt-btn" data-quick-amount="500">₹500</button>
+      <button type="button" class="quick-amt-btn" data-quick-amount="1000">₹1000</button>
+      <button type="button" class="quick-amt-btn" data-quick-amount="2000">₹2000</button>
+      <button type="button" class="quick-amt-btn" data-quick-amount="5000">₹5000</button>
+    </div>
+
+    <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+      <button class="dos-btn primary" type="submit">
+        {% if kind == 'income' %}+ Record Income{% else %}- Record Expense{% endif %}
+      </button>
+    </div>
+  </form>
+</section>
+
+<section class="terminal-panel">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">Ledger</p>
+      <h2>{{ page_title }}</h2>
+    </div>
+    <div class="summary-strip">
+      <span>Income {{ totals.income|money(current_user.currency) }}</span>
+      <span>Expense {{ totals.expense|money(current_user.currency) }}</span>
+    </div>
+  </div>
+  <form class="filter-row" method="get" hx-get="{{ active_path }}" hx-trigger="input changed delay:180ms" hx-target="#transaction-results">
+    <input name="search" type="search" value="{{ filters.search }}" placeholder="Search note, category, method">
+    <select name="category_id">
+      <option value="">All categories</option>
+      {% for category in categories %}
+        <option value="{{ category.id }}" {% if filters.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+      {% endfor %}
+    </select>
+    <input name="start" type="date" value="{{ filters.start }}">
+    <input name="end" type="date" value="{{ filters.end }}">
+    <button type="submit">Filter</button>
+    <a href="/reports/export.csv{% if kind %}?kind={{ kind }}{% endif %}" data-download data-op-name="EXPORTING LEDGER CSV...">CSV</a>
+  </form>
+  <div id="transaction-results">
+    {% include "partials/transaction_table.html" %}
+  </div>
+</section>
+{% endblock %}

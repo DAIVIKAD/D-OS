@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="terminal-page-header">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+    <div>
+      <p class="panel-kicker">TRACKING // OBLIGATIONS</p>
+      <h1>RECURRING PAYMENTS</h1>
+      <p class="muted" style="margin-top: 0.25rem;">Track subscriptions, rent, bills and other repeating payments.</p>
+    </div>
+    <a href="/more" class="dos-btn ghost" style="font-size: 1rem; padding: 0.35rem 0.75rem;">← Back to More</a>
+  </div>
+  <div class="ascii-divider" aria-hidden="true">──────────────────────────────────────────────────────────────────────────────────────────</div>
+</div>
+
+<div class="terminal-panel" style="margin-bottom: 1.25rem; border-color: rgba(102, 255, 153, 0.25); background: rgba(3, 13, 6, 0.6);">
+  <p class="panel-kicker">SYSTEM REMINDER PROTOCOL</p>
+  <p style="margin: 0; font-size: 1.1rem; line-height: 1.45; color: var(--text);">
+    D-OS tracks recurring payments as scheduled obligations and reminders so you know what is due.
+    <strong style="color: var(--green);">D-OS does not automatically create transactions</strong> — actual payments are recorded manually in the Ledger when paid.
+  </p>
+</div>
+
+<!-- Add Recurring Payment Panel -->
+<section class="terminal-panel">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">NEW SCHEDULED OBLIGATION</p>
+      <h2>Record a repeating payment</h2>
+    </div>
+  </div>
+
+  <form class="transaction-form" method="post" action="/settings/recurring" data-op-name="SAVING RECURRING PAYMENT...">
+    <label>Name
+      <input name="name" placeholder="Netflix, Rent, Internet, Insurance..." required>
+    </label>
+    <label>Category
+      <select name="category_id">
+        {% for category in expense_categories %}
+          <option value="{{ category.id }}">{{ category.icon }} {{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Amount ({{ current_user.currency if current_user else "₹" }})
+      <input name="amount" type="number" min="0.01" step="any" placeholder="649.00" required>
+    </label>
+    <label>Frequency
+      <select name="frequency">
+        <option value="monthly">Monthly</option>
+        <option value="weekly">Weekly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+    </label>
+    <label>Next Due Date
+      <input name="next_due" type="date">
+    </label>
+    <label>Note / Reference
+      <input name="note" placeholder="Account #, billing cycle, etc.">
+    </label>
+    <button class="terminal-button" type="submit">+ Add Recurring Payment</button>
+  </form>
+</section>
+
+<!-- Active Recurring Payments Table -->
+<section class="terminal-panel" style="margin-top: 1.25rem;">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">SCHEDULED OBLIGATIONS</p>
+      <h2>Active Recurring Payments ({{ recurring|length }})</h2>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="terminal-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Amount</th>
+          <th>Frequency</th>
+          <th>Next Due</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for item in recurring %}
+        <tr>
+          <td><strong>{{ item.name }}</strong>{% if item.note %}<small style="display:block; color: var(--muted);">{{ item.note }}</small>{% endif %}</td>
+          <td>{{ item.category.icon if item.category else '◇' }} {{ item.category.name if item.category else 'Expense' }}</td>
+          <td><strong style="color: #ffffff;">{{ item.amount|money(current_user.currency) }}</strong></td>
+          <td><span class="pill">{{ item.frequency|title }}</span></td>
+          <td>{{ item.next_due|format_date if item.next_due else '—' }}</td>
+          <td><span class="pill income">{{ item.status|upper }}</span></td>
+          <td>
+            <form method="post" action="/settings/recurring/{{ item.id }}/delete" onsubmit="return confirm('Remove this recurring payment?');">
+              <button class="link-danger" type="submit" title="Delete obligation">⌫</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="7" class="empty-cell">
+            <div class="chart-empty-state" style="min-height: 120px; border: none; padding: 1.5rem 0;">
+              <p class="panel-kicker">NO RECURRING PAYMENTS</p>
+              <p class="muted">Track subscriptions, rent, or bills by recording your first repeating obligation above.</p>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

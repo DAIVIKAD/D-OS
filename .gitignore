@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyc
+.env
+.DS_Store
+data/
+serviceAccountKey.json
+firebase-debug.log
+firestore-debug.log
+*.pem
+*.key

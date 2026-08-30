@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Header & Back Navigation -->
+<div class="terminal-page-header">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+    <div>
+      {% if view == 'custom' %}
+        <p class="panel-kicker">ISOLATED EVENT UNIVERSE // TRIP &amp; PROJECT PLANNER</p>
+        <h1>CUSTOM BUDGETS</h1>
+        <p class="muted" style="margin-top: 0.25rem;">Plan separate events without affecting your real monthly budget.</p>
+      {% else %}
+        <p class="panel-kicker">SYSTEM STATUS // BUDGET ALLOCATION MATRIX</p>
+        <h1>BUDGET &amp; EVENT PLANNER</h1>
+        <p class="muted" style="margin-top: 0.25rem;">Set monthly spending limits and track usage.</p>
+      {% endif %}
+    </div>
+    {% if view == 'custom' %}
+      <a href="/more" class="dos-btn ghost" style="font-size: 1rem; padding: 0.35rem 0.75rem;">← Back to More</a>
+    {% endif %}
+  </div>
+  <div class="ascii-divider" aria-hidden="true">──────────────────────────────────────────────────────────────────────────────────────────</div>
+</div>
+
+<!-- Mode Switcher Tabs -->
+<div style="display: flex; gap: 0.6rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+  <a href="/budget" class="dos-btn {% if view != 'custom' %}primary{% else %}ghost{% endif %}" style="text-decoration: none; font-size: 1.15rem; padding: 0.45rem 1rem;">
+    ▤ REAL MONTHLY BUDGET
+  </a>
+  <a href="/budget?view=custom" class="dos-btn {% if view == 'custom' %}primary{% else %}ghost{% endif %}" style="text-decoration: none; font-size: 1.15rem; padding: 0.45rem 1rem;">
+    ◈ CUSTOM BUDGETS ({{ custom_budgets|length }})
+  </a>
+</div>
+
+{% if view == 'custom' %}
+<!-- ==========================================================================
+     ISOLATED CUSTOM BUDGETS VIEW (ONLY Custom Budgets)
+     ========================================================================== -->
+<div class="terminal-panel" style="margin-bottom: 1.25rem; border-color: rgba(102, 255, 153, 0.25); background: rgba(3, 13, 6, 0.6);">
+  <p class="panel-kicker">DATA ISOLATION PROTOCOL</p>
+  <p style="margin: 0; font-size: 1.1rem; line-height: 1.45; color: var(--text);">
+    Custom Budgets operate in an <strong style="color: var(--green);">isolated event universe</strong>.
+    Expenses logged here never alter your real monthly spending, remaining budget balance, or Ledger transactions.
+  </p>
+</div>
+
+<section class="terminal-panel">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">CREATE ISOLATED PLAN</p>
+      <h2>New Custom Budget</h2>
+    </div>
+  </div>
+
+  <form class="transaction-form" method="post" action="/budget/custom" data-op-name="CREATING CUSTOM BUDGET...">
+    <label>Event / Budget Name
+      <input name="name" placeholder="e.g. Goa Trip, Wedding Shopping, Bike Purchase..." required>
+    </label>
+    <label>Allocated Amount (Target)
+      <input name="target_amount" type="number" min="0.01" step="any" placeholder="12000.00" required>
+    </label>
+    <button class="dos-btn primary" type="submit">+ Create Custom Budget</button>
+  </form>
+</section>
+
+<!-- Custom Budgets Cards Grid -->
+<section style="margin-top: 1.25rem;">
+  <div class="goal-grid">
+    {% for custom in custom_budgets %}
+    <article class="goal-tile terminal-panel" style="background: rgba(2, 8, 4, 0.75);">
+      <div class="goal-header">
+        <div>
+          <p class="panel-kicker">CUSTOM EVENT PLAN</p>
+          <h2>{{ custom.name }}</h2>
+        </div>
+        <span class="status-badge {{ custom.status|lower }}">{{ custom.status }}</span>
+      </div>
+
+      <div class="goal-progress-wrap">
+        <div class="progress-labels">
+          <span>Usage ({{ custom.progress|pct }})</span>
+          <span>Spent: {{ custom.spent_amount|money(current_user.currency) }} / {{ custom.target_amount|money(current_user.currency) }}</span>
+        </div>
+        <progress max="100" value="{{ custom.progress }}"></progress>
+      </div>
+
+      <dl class="goal-stats-grid">
+        <div><dt>Allocated</dt><dd>{{ custom.target_amount|money(current_user.currency) }}</dd></div>
+        <div><dt>Spent</dt><dd>{{ custom.spent_amount|money(current_user.currency) }}</dd></div>
+        <div><dt>Remaining</dt><dd>{{ custom.remaining|money(current_user.currency) }}</dd></div>
+        <div><dt>Status</dt><dd>{{ custom.status }}</dd></div>
+      </dl>
+
+      <!-- Log Expense Form towards this Custom Budget -->
+      <div class="goal-actions">
+        <form class="inline-form" method="post" action="/budget/custom/{{ custom.id }}/expense" data-op-name="LOGGING EVENT EXPENSE...">
+          <input name="amount" type="number" min="0.01" step="any" placeholder="Amount (₹)" required style="max-width: 130px;">
+          <input name="note" placeholder="Expense note (Hotel, Fuel...)" style="min-width: 140px;">
+          <button class="dos-btn primary" type="submit">+ Log Expense</button>
+        </form>
+
+        <!-- Expandable Expense History -->
+        {% if custom.expenses %}
+        <details class="edit-details" style="margin-top: 0.5rem;">
+          <summary class="dos-btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.95rem;">
+            <span>☰ View Logged Expenses ({{ custom.expenses|length }})</span>
+          </summary>
+          <div style="margin-top: 0.75rem; border-top: 1px solid var(--line-soft); padding-top: 0.6rem;">
+            <table class="terminal-table" style="font-size: 0.95rem;">
+              <thead>
+                <tr>
+                  <th>Note</th>
+                  <th>Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for exp in custom.expenses %}
+                <tr>
+                  <td>{{ exp.note }}</td>
+                  <td><strong style="color: var(--red);">{{ exp.amount|money(current_user.currency) }}</strong></td>
+                  <td class="row-actions">
+                    <details>
+                      <summary title="Edit" style="cursor: pointer; color: var(--green-dim);">✎</summary>
+                      <form method="post" action="/budget/custom/{{ custom.id }}/expense/{{ exp.id }}/update" class="edit-grid" style="min-width: 220px;">
+                        <input name="amount" type="number" min="0.01" step="any" value="{{ exp.amount }}" required>
+                        <input name="note" value="{{ exp.note }}">
+                        <button type="submit" class="dos-btn" style="padding: 0.2rem 0.5rem;">Save</button>
+                      </form>
+                    </details>
+                    <form method="post" action="/budget/custom/{{ custom.id }}/expense/{{ exp.id }}/delete" onsubmit="return confirm('Delete this expense?');">
+                      <button title="Delete" type="submit" class="link-danger" style="margin-left: 0.4rem;">⌫</button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </details>
+        {% endif %}
+
+        <form method="post" action="/budget/custom/{{ custom.id }}/delete" onsubmit="return confirm('Delete this custom budget?');" style="margin-top: 0.5rem;">
+          <button class="link-danger" type="submit">Delete Budget Plan</button>
+        </form>
+      </div>
+    </article>
+    {% else %}
+    <div class="terminal-panel" style="grid-column: 1 / -1;">
+      <div class="chart-empty-state" style="min-height: 140px;">
+        <p class="panel-kicker">NO CUSTOM BUDGETS</p>
+        <p class="muted">Plan separate projects like trips, weddings, or festivals without affecting your monthly budget.</p>
+        <button type="button" class="dos-btn ghost" onclick="document.querySelector('.transaction-form input[name=name]').focus()" style="margin-top: 0.5rem;">+ CREATE CUSTOM BUDGET</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% else %}
+<!-- ==========================================================================
+     REAL MONTHLY BUDGET VIEW
+     ========================================================================== -->
+<section class="metric-grid">
+  <article class="metric"><span>Monthly Budget</span><strong>{{ current_user.monthly_budget|money(current_user.currency) }}</strong></article>
+  <article class="metric"><span>Monthly Expense</span><strong>{{ spent|money(current_user.currency) }}</strong></article>
+  <article class="metric"><span>Remaining</span><strong>{{ remaining|money(current_user.currency) }}</strong></article>
+  <article class="metric"><span>Daily Spending Limit</span><strong>{{ daily_limit|money(current_user.currency) }}</strong></article>
+  <article class="metric"><span>Budget Health</span><strong>{{ health }}</strong></article>
+</section>
+
+<section class="dashboard-layout" style="margin-top: 1.25rem;">
+  <!-- Overall Monthly Budget Form -->
+  <article class="terminal-panel">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">MONTHLY LIMIT</p>
+        <h2>Set Overall Monthly Budget</h2>
+      </div>
+    </div>
+    <form class="stack-form" method="post" action="/budget/monthly" data-op-name="SAVING MONTHLY BUDGET...">
+      <label>Monthly Budget Amount ({{ current_user.currency if current_user else "₹" }})
+        <input name="monthly_budget" type="number" min="0" step="any" value="{{ current_user.monthly_budget }}" required>
+      </label>
+      <button class="dos-btn primary" type="submit">Save Monthly Budget</button>
+    </form>
+  </article>
+
+  <!-- Overall Budget Progress Chart -->
+  <article class="terminal-panel">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">VISUAL METRIC</p>
+        <h2>Budget Usage Breakdown</h2>
+      </div>
+    </div>
+    <canvas data-chart="doughnut" data-payload='{"labels":["Used","Remaining"],"values":[{{ spent }},{{ remaining }}]}'></canvas>
+  </article>
+</section>
+
+<!-- Category Budgets Table -->
+<section class="terminal-panel" style="margin-top: 1.25rem;">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">CATEGORY BREAKDOWN</p>
+      <h2>Category Budgets</h2>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="terminal-table">
+      <thead><tr><th>Category</th><th>Monthly Target</th><th>Action</th></tr></thead>
+      <tbody>
+      {% for category in categories %}
+        <tr>
+          <td>{{ category.icon }} {{ category.name }}</td>
+          <td><strong style="color: #ffffff;">{{ category.monthly_budget|money(current_user.currency) }}</strong></td>
+          <td>
+            <form class="inline-form" method="post" action="/budget/category/{{ category.id }}">
+              <input name="monthly_budget" type="number" min="0" step="any" value="{{ category.monthly_budget }}" style="max-width: 140px;">
+              <button class="dos-btn ghost" type="submit">Save Target</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

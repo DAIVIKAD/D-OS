@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- System Header -->
+<div class="terminal-page-header">
+  <p class="panel-kicker">SYSTEM STATUS // FINANCIAL ANALYTICS ENGINE</p>
+  <h1>ANALYTICS</h1>
+  <div class="ascii-divider" aria-hidden="true">──────────────────────────────────────────────────────────────────────────────────────────</div>
+</div>
+
+{% if charts.warning_popup %}
+<section class="warning-banner" data-dismissible>
+  <div>
+    <span class="blip-warning">[!] BUDGET WARNING</span>
+    <strong>{{ charts.warning_popup.title }}</strong>
+    <span>{{ charts.warning_popup.amount|money(current_user.currency) }} · {{ charts.warning_popup.action }}</span>
+  </div>
+  <button class="icon-button" data-dismiss title="Dismiss">×</button>
+</section>
+{% endif %}
+
+{% if not charts.category_pie.has_data and not charts.monthly_income_expense.has_data and not charts.savings_trajectory.has_data and not charts.budget_progress.has_budget %}
+<section class="terminal-panel empty-state-box">
+  <div class="empty-state-inner">
+    <p class="panel-kicker">SYSTEM ALERT // NO FINANCIAL DATA AVAILABLE</p>
+    <h2>NO FINANCIAL DATA AVAILABLE</h2>
+    <p class="muted">Add expenses or income in the Ledger to generate real-time analytics.</p>
+    <div class="quick-actions" style="margin-top: 1rem;">
+      <button type="button" class="dos-btn primary" data-open-modal="quick-tx-modal">+ Record Transaction</button>
+      <a class="dos-btn primary" href="/budget">+ Set Monthly Budget</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- System Insights Banner -->
+<section class="terminal-panel">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">SYSTEM STATUS // MONEY ENGINE INSIGHTS</p>
+      <h2>INTELLIGENCE LOG</h2>
+    </div>
+    <span class="blink">█</span>
+  </div>
+  <div class="smart-insights-list">
+    {% for insight in smart_insights %}
+      <div class="insight-card {{ insight.type }}">
+        <strong>
+          {% if insight.type == 'warning' %}
+            <span class="blip-warning">[!]</span>
+          {% elif insight.type == 'success' %}
+            [✓]
+          {% else %}
+            [◈]
+          {% endif %}
+          {{ insight.title }}
+        </strong>
+        <p>{{ insight.message }}</p>
+      </div>
+    {% else %}
+      <p class="muted">All financial systems operational. Add more transactions to unlock deeper automated intelligence insights.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Power BI Style Multi-Column Balanced Dashboard Layout -->
+<section class="pbi-dashboard-grid">
+
+  <!-- ROW 1: Monthly Income vs Expense (Full Span Hero Chart) -->
+  <article class="terminal-panel chart-panel full-span">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">FLOW ANALYSIS <span class="blip-warning">[!]</span></p>
+        <h2>Monthly Income vs Expense</h2>
+      </div>
+    </div>
+    {% if not charts.monthly_income_expense.has_data %}
+      <div class="chart-empty-state">
+        <p class="panel-kicker">NO INCOME OR EXPENSE DATA</p>
+        <p class="muted">Record transactions in the Ledger to generate income vs expense flow.</p>
+        <div class="quick-actions" style="margin-top: 0.5rem;">
+          <a class="dos-btn ghost" href="/income">+ Add Income</a>
+          <a class="dos-btn ghost" href="/expenses">+ Add Expense</a>
+        </div>
+      </div>
+    {% else %}
+      <canvas data-chart="bar" data-x-title="Month" data-y-title="Amount (₹)" data-payload='{{ charts.monthly_income_expense|tojson }}'></canvas>
+    {% endif %}
+  </article>
+
+  <!-- ROW 2: Expense Allocation (1/2) + Savings Trajectory (1/2) -->
+  <article class="terminal-panel chart-panel half-span">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">CATEGORY BREAKDOWN</p>
+        <h2>Expense Allocation</h2>
+      </div>
+    </div>
+    {% if not charts.category_pie.has_data %}
+      <div class="chart-empty-state">
+        <p class="panel-kicker">NO EXPENSE DATA</p>
+        <p class="muted">Add expenses to generate category allocation.</p>
+        <a class="dos-btn ghost" href="/expenses" style="margin-top: 0.5rem;">+ Add Expense</a>
+      </div>
+    {% else %}
+      <div class="doughnut-with-legend">
+        <div class="doughnut-canvas-wrap">
+          <canvas data-chart="doughnut" data-payload='{{ charts.category_pie|tojson }}'></canvas>
+        </div>
+        <div class="category-legend-list">
+          {% for item in charts.category_pie.category_list[:6] %}
+          <div class="category-legend-row">
+            <span class="swatch" style="--swatch: {{ item.color }};"></span>
+            <span class="category-name">{{ item.name }}</span>
+            <span class="category-amount">{{ item.amount|money(current_user.currency) }}</span>
+            <span class="category-pct">({{ item.pct }})</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </article>
+
+  <article class="terminal-panel chart-panel half-span">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">TREND ANALYSIS</p>
+        <h2>Savings Trajectory</h2>
+      </div>
+    </div>
+    {% if not charts.savings_trajectory.has_data %}
+      <div class="chart-empty-state">
+        <p class="panel-kicker">INSUFFICIENT DATA FOR TREND</p>
+        <p class="muted">Record income and expenses across multiple months to track savings trend.</p>
+      </div>
+    {% else %}
+      <canvas data-chart="line" data-x-title="Month" data-y-title="Net Savings (₹)" data-payload='{{ charts.savings_trajectory|tojson }}'></canvas>
+    {% endif %}
+  </article>
+
+  <!-- ROW 3: Monthly Budget Progress (Full Span Hero Card) -->
+  <article class="terminal-panel chart-panel full-span">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">BUDGET ALLOCATION &amp; USAGE</p>
+        <h2>Monthly Budget Progress</h2>
+      </div>
+      {% if charts.budget_progress.has_budget %}
+      <a href="/budget">Manage Budget</a>
+      {% endif %}
+    </div>
+    {% if not charts.budget_progress.has_budget %}
+      <div class="chart-empty-state">
+        <p class="panel-kicker">NO ACTIVE BUDGET</p>
+        <p class="muted">Create a budget in Budget Planner to view monthly progress and spending limits.</p>
+        <a class="dos-btn ghost" href="/budget" style="margin-top: 0.5rem;">+ Set Monthly Budget</a>
+      </div>
+    {% else %}
+      <div class="budget-progress-dashboard">
+        <div class="budget-visual-col">
+          <canvas data-chart="doughnut" data-payload='{{ charts.budget_progress|tojson }}'></canvas>
+        </div>
+        <div class="budget-metrics-col">
+          <div class="budget-stat-card">
+            <span class="panel-kicker">MONTHLY ALLOCATED</span>
+            <strong class="stat-value">{{ charts.budget_progress.budget|money(current_user.currency) }}</strong>
+          </div>
+          <div class="budget-stat-card">
+            <span class="panel-kicker">TOTAL SPENT</span>
+            <strong class="stat-value" style="color: var(--red);">{{ charts.budget_progress.spent|money(current_user.currency) }}</strong>
+          </div>
+          <div class="budget-stat-card">
+            <span class="panel-kicker">REMAINING BALANCE</span>
+            <strong class="stat-value" style="color: var(--green);">{{ charts.budget_progress.remaining|money(current_user.currency) }}</strong>
+          </div>
+          <div class="budget-stat-card">
+            <span class="panel-kicker">BUDGET USAGE</span>
+            <strong class="stat-value">{{ charts.budget_progress.progress|pct }}</strong>
+            <progress max="100" value="{{ charts.budget_progress.progress }}" style="margin-top: 0.4rem;"></progress>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </article>
+
+  <!-- ROW 4: Cumulative Cash Flow & Goal Completion -->
+  <article class="terminal-panel chart-panel half-span">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">CASH FLOW MATRIX</p>
+        <h2>Cumulative Cash Flow</h2>
+      </div>
+    </div>
+    {% if not charts.cumulative_cash_flow.has_data %}
+      <div class="chart-empty-state">
+        <p class="panel-kicker">NO CASH FLOW DATA</p>
+        <p class="muted">Add transactions to generate cumulative cash flow timeline.</p>
+      </div>
+    {% else %}
+      <canvas data-chart="line" data-x-title="Timeline" data-y-title="Cumulative Balance (₹)" data-payload='{{ charts.cumulative_cash_flow|tojson }}'></canvas>
+    {% endif %}
+  </article>
+
+  <article class="terminal-panel chart-panel half-span">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">TARGET METRICS</p>
+        <h2>Financial Goals Completion</h2>
+      </div>
+    </div>
+    {% if not charts.goal_progress.has_data %}
+      <div class="chart-empty-state">
+        <p class="panel-kicker">NO ACTIVE GOALS</p>
+        <p class="muted">Create financial goals to track progress visually.</p>
+        <a class="dos-btn ghost" href="/goals" style="margin-top: 0.5rem;">+ Create Goal</a>
+      </div>
+    {% else %}
+      <canvas data-chart="bar" data-x-title="Goal Name" data-y-title="Completion (%)" data-payload='{{ charts.goal_progress|tojson }}'></canvas>
+    {% endif %}
+  </article>
+
+</section>
+{% endblock %}

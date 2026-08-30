@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="terminal-page-header">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+    <div>
+      <p class="panel-kicker">FINANCIAL PLANNING // PROJECTIONS</p>
+      <h1>INVESTMENT CALCULATOR</h1>
+      <p class="muted" style="margin-top: 0.25rem;">Project SIP, FD and RD returns over time.</p>
+    </div>
+    <a href="/more" class="dos-btn ghost" style="font-size: 1rem; padding: 0.35rem 0.75rem;">← Back to More</a>
+  </div>
+  <div class="ascii-divider" aria-hidden="true">──────────────────────────────────────────────────────────────────────────────────────────</div>
+</div>
+
+<section class="terminal-panel">
+  <form class="transaction-form" method="post" action="/investment/calculate">
+    <label>Mode
+      <select name="kind">
+        <option value="sip">SIP</option>
+        <option value="fixed_deposit">Fixed Deposit</option>
+        <option value="recurring_deposit">Recurring Deposit</option>
+        <option value="custom">Custom Investment</option>
+      </select>
+    </label>
+    <label>Initial
+      <input name="initial_amount" type="number" min="0" step="any" value="10000">
+    </label>
+    <label>Monthly
+      <input name="monthly_investment" type="number" min="0" step="any" value="5000">
+    </label>
+    <label>Interest %
+      <input name="interest_rate" type="number" min="0" step="any" value="10" required>
+    </label>
+    <label>Years
+      <input name="years" type="number" min="1" step="1" value="5" required>
+    </label>
+    <button class="terminal-button" type="submit">Calculate</button>
+  </form>
+</section>
+
+<section class="dashboard-layout">
+  <article class="terminal-panel">
+    <div class="panel-head">
+      <div><p class="panel-kicker">Projection</p><h2>{{ result.kind|replace('_', ' ')|title }}</h2></div>
+    </div>
+    <section class="metric-grid compact">
+      <article class="metric"><span>Final Value</span><strong>{{ result.final_value|money(current_user.currency) }}</strong></article>
+      <article class="metric"><span>Interest Earned</span><strong>{{ result.interest_earned|money(current_user.currency) }}</strong></article>
+      <article class="metric"><span>Total Invested</span><strong>{{ result.total_invested|money(current_user.currency) }}</strong></article>
+    </section>
+    <canvas data-chart="line" data-payload='{"labels": {{ result.series|map(attribute="label")|list|tojson }}, "values": {{ result.series|map(attribute="value")|list|tojson }} }'></canvas>
+  </article>
+  <article class="terminal-panel">
+    <div class="panel-head"><div><p class="panel-kicker">Save</p><h2>Investment Plan</h2></div></div>
+    <form class="stack-form" method="post" action="/investment/plans">
+      <label>Name<input name="name" required placeholder="Index SIP"></label>
+      <label>Kind
+        <select name="kind">
+          <option value="sip">SIP</option>
+          <option value="fixed_deposit">Fixed Deposit</option>
+          <option value="recurring_deposit">Recurring Deposit</option>
+          <option value="custom">Custom</option>
+        </select>
+      </label>
+      <label>Initial<input name="initial_amount" type="number" min="0" step="any" value="0"></label>
+      <label>Monthly<input name="monthly_investment" type="number" min="0" step="any" value="5000"></label>
+      <label>Interest %<input name="interest_rate" type="number" min="0" step="any" value="10"></label>
+      <label>Years<input name="years" type="number" min="1" step="1" value="5"></label>
+      <button class="terminal-button" type="submit">Save Plan</button>
+    </form>
+  </article>
+</section>
+
+<section class="terminal-panel">
+  <div class="panel-head"><div><p class="panel-kicker">Saved</p><h2>Plans</h2></div></div>
+  <div class="table-wrap">
+    <table class="terminal-table">
+      <thead><tr><th>Name</th><th>Kind</th><th>Initial</th><th>Monthly</th><th>Interest</th><th>Years</th><th></th></tr></thead>
+      <tbody>
+        {% for plan in plans %}
+        <tr>
+          <td>{{ plan.name }}</td>
+          <td>{{ plan.kind|replace('_', ' ')|title }}</td>
+          <td>{{ plan.initial_amount|money(current_user.currency) }}</td>
+          <td>{{ plan.monthly_investment|money(current_user.currency) }}</td>
+          <td>{{ plan.interest_rate }}%</td>
+          <td>{{ plan.years }}</td>
+          <td><form method="post" action="/investment/plans/{{ plan.id }}/delete"><button>⌫</button></form></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="empty-cell">No saved plans.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

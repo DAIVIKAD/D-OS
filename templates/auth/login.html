@@ -1,0 +1,26 @@
+{% extends "auth/base.html" %}
+{% block auth_content %}
+<form class="glass-form" data-auth-form="login" method="POST" action="javascript:void(0)">
+  <div>
+    <p class="eyebrow">ACCESS TERMINAL</p>
+    <h2>Login</h2>
+  </div>
+  <p class="form-error" data-auth-error hidden></p>
+  <p class="form-success" data-auth-success hidden></p>
+  <label>Email
+    <input name="email" type="email" autocomplete="email" required placeholder="demo@dos.local">
+  </label>
+  <label class="password-field">Password
+    <div class="password-input-wrap">
+      <input name="password" type="password" autocomplete="current-password" required placeholder="rupee123">
+      <button type="button" class="password-toggle-btn" data-toggle-password aria-label="Show password" title="Show password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
+  </label>
+  <button class="dos-btn primary" type="submit">Enter D-OS</button>
+  <button class="dos-btn ghost" type="button" data-google-login>Google Login</button>
+  <div class="auth-links">
+    <a href="/register">Create account</a>
+    <a href="/forgot-password">Reset password</a>
+  </div>
+</form>
+{% endblock %}

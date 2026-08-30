@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="terminal-page-header">
+  <p class="panel-kicker">SYSTEM DIRECTORY // NAVIGATION</p>
+  <h1>MORE</h1>
+  <p class="muted" style="margin-top: 0.25rem;">Tools, planning, reports and system information.</p>
+  <div class="ascii-divider" aria-hidden="true">──────────────────────────────────────────────────────────────────────────────────────────</div>
+</div>
+
+<section class="more-page-container">
+
+  <!-- 3A. QUICK ACCESS — COMPACT SQUARE TILES -->
+  <div class="more-section">
+    <p class="more-section-label">QUICK ACCESS</p>
+    <div class="more-quick-grid">
+      <a href="/money" class="quick-tile" title="Transactions Ledger">
+        <span class="quick-tile-icon">₹</span>
+        <strong class="quick-tile-title">TRANSACTIONS</strong>
+        <span class="quick-tile-sub">Ledger &amp; history</span>
+      </a>
+
+      <a href="/goals" class="quick-tile" title="Financial Goals">
+        <span class="quick-tile-icon">◎</span>
+        <strong class="quick-tile-title">GOALS</strong>
+        <span class="quick-tile-sub">Target savings</span>
+      </a>
+
+      <a href="/budget?view=custom" class="quick-tile" title="Custom Budget & Event Planner">
+        <span class="quick-tile-icon">▤</span>
+        <strong class="quick-tile-title">CUSTOM BUDGET</strong>
+        <span class="quick-tile-sub">Trip &amp; event plans</span>
+      </a>
+
+      <a href="/lend-borrow" class="quick-tile" title="Lend & Borrow">
+        <span class="quick-tile-icon">⇄</span>
+        <strong class="quick-tile-title">LEND &amp; BORROW</strong>
+        <span class="quick-tile-sub">Debts &amp; credits</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 3B. FINANCIAL TOOLS — RECTANGULAR CARDS -->
+  <div class="more-section">
+    <p class="more-section-label">FINANCIAL TOOLS</p>
+    <div class="more-list-group">
+      <a href="/recurring" class="more-nav-item">
+        <span class="more-nav-icon">↻</span>
+        <div class="more-nav-text">
+          <strong>Recurring Payments</strong>
+          <span>Track subscriptions, rent, bills and other repeating obligations.</span>
+        </div>
+        <span class="more-nav-arrow">→</span>
+      </a>
+
+      <a href="/investment" class="more-nav-item">
+        <span class="more-nav-icon">▲</span>
+        <div class="more-nav-text">
+          <strong>Investment Calculator</strong>
+          <span>Project SIP, FD and RD returns over time.</span>
+        </div>
+        <span class="more-nav-arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- DATA & INFORMATION — RECTANGULAR CARDS -->
+  <div class="more-section">
+    <p class="more-section-label">DATA &amp; INFORMATION</p>
+    <div class="more-list-group">
+      <a href="/reports" class="more-nav-item">
+        <span class="more-nav-icon">▧</span>
+        <div class="more-nav-text">
+          <strong>Reports</strong>
+          <span>Monthly and category financial reports and CSV/PDF export.</span>
+        </div>
+        <span class="more-nav-arrow">→</span>
+      </a>
+
+      <a href="/help" class="more-nav-item">
+        <span class="more-nav-icon">?</span>
+        <div class="more-nav-text">
+          <strong>Help Center</strong>
+          <span>Local documentation, feature guides and system answers.</span>
+        </div>
+        <span class="more-nav-arrow">→</span>
+      </a>
+
+      <a href="/about" class="more-nav-item">
+        <span class="more-nav-icon">◉</span>
+        <div class="more-nav-text">
+          <strong>About D-OS</strong>
+          <span>Version 1.0.0, core architecture and product authorship.</span>
+        </div>
+        <span class="more-nav-arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- SESSION -->
+  <div class="more-section">
+    <p class="more-section-label">SESSION</p>
+    <form method="post" action="/logout" class="more-logout-form">
+      <button type="submit" class="more-nav-item more-nav-logout">
+        <span class="more-nav-icon">⏻</span>
+        <div class="more-nav-text">
+          <strong>Logout</strong>
+          <span>End your current D-OS terminal session.</span>
+        </div>
+        <span class="more-nav-arrow">→</span>
+      </button>
+    </form>
+  </div>
+
+</section>
+{% endblock %}

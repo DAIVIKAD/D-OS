@@ -1,0 +1,52 @@
+<div class="table-wrap">
+  <table class="terminal-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Category</th>
+        <th>Amount</th>
+        <th>Note</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tx in rows %}
+      <tr>
+        <td>{{ tx.date|format_date }}</td>
+        <td><span class="pill {{ tx.type }}">{{ tx.type }}</span></td>
+        <td>{{ tx.category.icon if tx.category else "◇" }} {{ tx.category.name if tx.category else "Uncategorized" }}</td>
+        <td class="{{ 'good' if tx.type == 'income' else 'bad' }}">{{ tx.amount|money(current_user.currency) }}</td>
+        <td>{{ tx.note or tx.payment_method }}</td>
+        <td class="row-actions">
+          <details>
+            <summary title="Edit">✎</summary>
+            <form method="post" action="/transactions/{{ tx.id }}/update" class="edit-grid">
+              <select name="type">
+                <option value="expense" {% if tx.type == 'expense' %}selected{% endif %}>Expense</option>
+                <option value="income" {% if tx.type == 'income' %}selected{% endif %}>Income</option>
+              </select>
+              <select name="category_id">
+                {% for category in all_categories|default(categories, true) %}
+                  <option value="{{ category.id }}" {% if tx.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+              </select>
+              <input name="amount" type="number" min="0.01" step="any" value="{{ tx.amount }}" required>
+              <input name="date" type="date" value="{{ tx.date.isoformat() if tx.date and tx.date.isoformat is defined else tx.date|default('', true) }}" required>
+              <input name="payment_method" value="{{ tx.payment_method }}">
+              <input name="note" value="{{ tx.note }}">
+              <button type="submit">Save</button>
+            </form>
+          </details>
+          <form method="post" action="/transactions/{{ tx.id }}/delete">
+            <button title="Delete" type="submit">⌫</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty-cell">No transactions.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+

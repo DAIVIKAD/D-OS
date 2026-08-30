@@ -1,0 +1,2 @@
+"""Firebase integration package."""
+

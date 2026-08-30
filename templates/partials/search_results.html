@@ -1,0 +1,21 @@
+{% set has_results = results.transactions or results.goals or results.debts or results.recurring %}
+{% if query and has_results %}
+<div class="terminal-panel search-panel">
+  {% for group, items in results.items() %}
+    {% if items %}
+      <p class="panel-kicker">{{ group|replace('_', ' ')|title }}</p>
+      {% for item in items %}
+        <a class="search-result" href="{{ item.url }}">
+          <span>{{ item.label }}</span>
+          <small>{{ item.detail }} · {{ item.amount|money(current_user.currency) }}</small>
+        </a>
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+</div>
+{% elif query %}
+<div class="terminal-panel search-panel">
+  <p class="muted">No matches.</p>
+</div>
+{% endif %}
+

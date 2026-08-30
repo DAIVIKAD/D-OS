@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title }} · D-OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/static/css/tailwind.css">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body class="terminal-body">
+  <div class="crt-overlay" aria-hidden="true"></div>
+  <div class="app-frame">
+    <header class="top-nav-bar">
+      <div class="top-nav-main">
+        <a class="terminal-logo" href="/">
+          <span class="logo-full">D-OS <small class="logo-subtitle">MONEY OPERATING SYSTEM</small></span>
+          <span class="logo-short">D-OS <small class="logo-subtitle" style="font-size: 0.62rem; display: block; line-height: 1; letter-spacing: 0.1em;">MONEY OPERATING SYSTEM</small></span>
+        </a>
+        <span class="mobile-online-status">ONLINE ●</span>
+        <nav class="top-nav-links" aria-label="Primary">
+          {% for label, href, icon in nav_items %}
+            <a href="{{ href }}" class="top-nav-item {% if active_path == href or (href != '/' and active_path.startswith(href)) %}active{% endif %}">
+              <span class="nav-icon">{{ icon }}</span><span>{{ label }}</span>
+            </a>
+          {% endfor %}
+        </nav>
+      </div>
+
+      <div class="top-nav-actions">
+        <button type="button" class="dos-btn primary" data-open-modal="quick-tx-modal" title="Record New Transaction" style="padding: 0.35rem 0.75rem; font-size: 0.95rem;">
+          + Record
+        </button>
+        <form class="global-search" action="/search" method="get">
+          <input name="q" type="search" placeholder="Search everything..." autocomplete="off"
+            hx-get="/search" hx-trigger="keyup changed delay:160ms" hx-target="#search-results" hx-swap="innerHTML">
+          <button type="submit" title="Search">⌕</button>
+          <div id="search-results" class="search-popover" aria-live="polite"></div>
+        </form>
+        <span class="header-username">{{ current_user.username if current_user else "" }}</span>
+        <a href="/settings" class="settings-gear-link" title="Settings">⚙</a>
+        <form method="post" action="/logout" class="inline-logout-form">
+          <button type="submit" class="logout-btn" title="Logout">⏻</button>
+        </form>
+      </div>
+
+      <!-- Mobile header actions (visible only on mobile) -->
+      <div class="mobile-header-actions">
+        <span class="header-username-mobile">{{ current_user.username if current_user else "" }}</span>
+        <a href="/settings" class="settings-gear-link" title="Settings">⚙</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <main class="content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <nav class="mobile-bottom-nav" aria-label="Mobile primary">
+    <a href="/" class="{% if active_path == '/' %}active{% endif %}"><span>⌂</span><b>Dashboard</b></a>
+    <a href="/visualize" class="{% if active_path.startswith('/visualize') %}active{% endif %}"><span>▥</span><b>Analytics</b></a>
+    <button type="button" class="mobile-add-action" data-open-modal="quick-tx-modal" title="Record Transaction"><span>＋</span><b>Add</b></button>
+    <a href="/budget" class="{% if active_path.startswith('/budget') %}active{% endif %}"><span>▤</span><b>Budget</b></a>
+    <a href="/more" class="{% if active_path.startswith('/more') or active_path.startswith('/recurring') or active_path.startswith('/help') or active_path.startswith('/about') or active_path.startswith('/investment') or active_path.startswith('/lend-borrow') or active_path.startswith('/reports') %}active{% endif %}"><span>☰</span><b>More</b></a>
+  </nav>
+
+  <!-- First-Time Onboarding Tour -->
+  {% if current_user and not current_user.has_seen_onboarding %}
+  <div id="onboarding-overlay" class="onboarding-overlay" role="dialog" aria-modal="true" aria-label="D-OS Welcome Tour">
+    <div class="onboarding-backdrop"></div>
+    <div class="onboarding-card">
+      <!-- Step 0: Welcome -->
+      <div class="onboarding-step active" data-onboarding-step="0">
+        <p class="panel-kicker">SYSTEM // INITIALIZATION</p>
+        <h2>WELCOME TO D-OS</h2>
+        <p class="panel-kicker" style="color: var(--green); font-size: 1.05rem; margin: 0.15rem 0;">MONEY OPERATING SYSTEM</p>
+        <p class="muted">Your personal finance command center. Let's take a quick tour of the system.</p>
+        <div class="onboarding-actions">
+          <button type="button" class="dos-btn primary" data-onboarding-action="next">START TOUR</button>
+          <button type="button" class="dos-btn ghost" data-onboarding-action="skip">SKIP</button>
+        </div>
+      </div>
+      <!-- Step 1: Dashboard -->
+      <div class="onboarding-step" data-onboarding-step="1">
+        <p class="panel-kicker">STEP 1 OF 8</p>
+        <h2>⌂ DASHBOARD</h2>
+        <p>Your financial overview. Monitor today's spending, monthly expenses, savings, remaining budget, and financial insights at a glance.</p>
+        <div class="onboarding-actions">
+          <button type="button" class="dos-btn ghost" data-onboarding-action="back">BACK</button>
+          <button type="button" class="dos-btn primary" data-onboarding-action="next">NEXT</button>
+          <button type="button" class="dos-btn ghost" data-onboarding-action="skip">SKIP TOUR</button>
+        </div>
+      </div>
+      <!-- Step 2: Analytics -->
+      <div class="onboarding-step" data-onboarding-step="2">
+        <p class="panel-kicker">STEP 2 OF 8</p>
+        <h2>▥ ANALYTICS</h2>
+        <p>Understand your spending and income patterns through visual charts, category breakdowns, savings trajectory, and cash flow.</p>
+        <div class="onboarding-actions">
+          <button type="button" class="dos-btn ghost" data-onboarding-action="back">BACK</button>
+          <button type="button" class="dos-btn primary" data-onboarding-action="next">NEXT</button>
+          <button type="button" class="dos-btn ghost" data-onboarding-action="skip">SKIP TOUR</button>
+        </div>
+      </div>
+      <!-- Step 3: Add Transaction -->
+      <div class="onboarding-step" data-onboarding-step="3">
+        <p class="panel-kicker">STEP 3 OF 8</p>
+        <h2>＋ ADD TRANSACTION</h2>
+        <p>Record income and expenses here from anywhere in the app with category tiles and quick amount shortcuts.</p>
+        <div class="onboarding-actions">
+          <button type="button" class="dos-btn ghost" data-onboarding-action="back">BACK</button>
+          <button type="button" class="dos-btn primary" data-onboarding-action="next">NEXT</button>
+          <button type="button" class="dos-btn ghost" data-onboarding-action="skip">SKIP TOUR</button>
+        </div>
+      </div>
+      <!-- Step 4: Budget -->
+      <div class="onboarding-step" data-onboarding-step="4">
+        <p class="panel-kicker">STEP 4 OF 8</p>
+        <h2>▤ BUDGET</h2>
+        <p>Set and track your real monthly budget. Plan separate projects and events using isolated Custom Budgets.</p>
+        <div class="onboarding-actions">
+          <button type="button" class="dos-btn ghost" data-onboarding-action="back">BACK</button>
+          <button type="button" class="dos-btn primary" data-onboarding-action="next">NEXT</button>
+          <button type="button" class="dos-btn ghost" data-onboarding-action="skip">SKIP TOUR</button>
+        </div>
+      </div>
+      <!-- Step 5: Goals -->
+      <div class="onboarding-step" data-onboarding-step="5">
+        <p class="panel-kicker">STEP 5 OF 8</p>
+        <h2>◎ GOALS</h2>
+        <p>Track money you are intentionally saving toward a target — calculate daily, weekly, and monthly paces to reach them.</p>
+        <div class="onboarding-actions">
+          <button type="button" class="dos-btn ghost" data-onboarding-action="back">BACK</button>
+          <button type="button" class="dos-btn primary" data-onboarding-action="next">NEXT</button>
+          <button type="button" class="dos-btn ghost" data-onboarding-action="skip">SKIP TOUR</button>
+        </div>
+      </div>
+      <!-- Step 6: More -->
+      <div class="onboarding-step" data-onboarding-step="6">
+        <p class="panel-kicker">STEP 6 OF 8</p>
+        <h2>☰ MORE</h2>
+        <p>Access additional financial tools — Transactions ledger, Custom Budgets, Lend &amp; Borrow, Recurring Payments, and Reports.</p>
+        <div class="onboarding-actions">
+          <button type="button" class="dos-btn ghost" data-onboarding-action="back">BACK</button>
+          <button type="button" class="dos-btn primary" data-onboarding-action="next">NEXT</button>
+          <button type="button" class="dos-btn ghost" data-onboarding-action="skip">SKIP TOUR</button>
+        </div>
+      </div>
+      <!-- Step 7: Settings -->
+      <div class="onboarding-step" data-onboarding-step="7">
+        <p class="panel-kicker">STEP 7 OF 8</p>
+        <h2>⚙ SETTINGS</h2>
+        <p>Configure your profile, currency symbol, custom expense/income categories, and password security via the ⚙ icon in the header.</p>
+        <div class="onboarding-actions">
+          <button type="button" class="dos-btn ghost" data-onboarding-action="back">BACK</button>
+          <button type="button" class="dos-btn primary" data-onboarding-action="next">NEXT</button>
+          <button type="button" class="dos-btn ghost" data-onboarding-action="skip">SKIP TOUR</button>
+        </div>
+      </div>
+      <!-- Step 8: Help Center -->
+      <div class="onboarding-step" data-onboarding-step="8">
+        <p class="panel-kicker">STEP 8 OF 8</p>
+        <h2>? HELP CENTER</h2>
+        <p>Local documentation and guides for using D-OS — searchable, 100% offline, with answers to common questions.</p>
+        <div class="onboarding-actions">
+          <button type="button" class="dos-btn ghost" data-onboarding-action="back">BACK</button>
+          <button type="button" class="dos-btn primary" data-onboarding-action="complete">FINISH TOUR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Global Fast Transaction Modal -->
+  <div id="quick-tx-modal" class="terminal-modal-backdrop" role="dialog" aria-modal="true">
+    <div class="terminal-modal-window">
+      <div class="terminal-modal-head">
+        <div>
+          <p class="panel-kicker">LEDGER ENGINE // FAST ENTRY</p>
+          <h3>RECORD TRANSACTION</h3>
+        </div>
+        <button type="button" class="icon-button" data-close-modal title="Close">×</button>
+      </div>
+      <form method="post" action="/transactions" data-op-name="RECORDING TRANSACTION...">
+        <input type="hidden" name="type" value="expense">
+        
+        <!-- Segmented Type Selector -->
+        <div class="transaction-type-switcher" data-transaction-switcher>
+          <button type="button" class="type-toggle-btn active" data-type-btn="expense">- Expense</button>
+          <button type="button" class="type-toggle-btn" data-type-btn="income">+ Income</button>
+        </div>
+
+        <!-- Visual Category Tiles Grid -->
+        <div class="category-visual-selector" data-category-selector>
+          <div class="category-tiles-grid">
+            {% for category in global_categories %}
+              <button type="button" class="category-tile-btn {% if loop.first %}active{% endif %}" data-cat-id="{{ category.id }}" data-kind="{{ category.kind }}" title="{{ category.name }}">
+                <span class="cat-icon-badge">{{ category.icon }}</span>
+                <span class="cat-name-label">{{ category.name }}</span>
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.5rem;">
+          <label>Category
+            <select name="category_id" required>
+              {% for category in global_categories %}
+                <option value="{{ category.id }}" data-kind="{{ category.kind }}">{{ category.icon }} {{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label>Amount ({{ current_user.currency if current_user else "₹" }})
+            <input name="amount" type="number" min="0.01" step="any" placeholder="0.00" required autofocus>
+          </label>
+          <label>Date
+            <input name="date" type="date" required>
+          </label>
+          <label>Payment Method
+            <input name="payment_method" placeholder="UPI, Cash, Card, Bank">
+          </label>
+          <label style="grid-column: span 2;">Note / Reference
+            <input name="note" placeholder="Description or note">
+          </label>
+        </div>
+
+        <!-- Quick Amount Shortcuts -->
+        <div class="quick-amounts-bar">
+          <span class="panel-kicker" style="font-size: 0.85rem;">QUICK AMOUNT:</span>
+          <button type="button" class="quick-amt-btn" data-quick-amount="100">₹100</button>
+          <button type="button" class="quick-amt-btn" data-quick-amount="200">₹200</button>
+          <button type="button" class="quick-amt-btn" data-quick-amount="500">₹500</button>
+          <button type="button" class="quick-amt-btn" data-quick-amount="1000">₹1000</button>
+          <button type="button" class="quick-amt-btn" data-quick-amount="2000">₹2000</button>
+          <button type="button" class="quick-amt-btn" data-quick-amount="5000">₹5000</button>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+          <button type="button" class="dos-btn ghost" data-close-modal>Cancel</button>
+          <button type="submit" class="dos-btn primary">- Record Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/vendor/htmx.min.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

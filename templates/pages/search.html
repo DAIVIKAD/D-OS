@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="terminal-panel">
+  <form class="inline-form" action="/search" method="get">
+    <label>Search
+      <input name="q" type="search" value="{{ query }}" autofocus>
+    </label>
+    <button class="terminal-button" type="submit">Run</button>
+  </form>
+</section>
+{% include "partials/search_results.html" %}
+{% endblock %}
+

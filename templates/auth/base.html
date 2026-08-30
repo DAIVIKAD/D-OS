@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title }} · D-OS</title>
+  <meta name="description" content="D-OS — Take Control of Every Rupee. Personal finance dashboard powered by Daivik.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/static/css/tailwind.css">
+  <link rel="stylesheet" href="/static/css/auth.css">
+</head>
+<body class="auth-body">
+
+  <div class="crt-vignette" aria-hidden="true"></div>
+
+  <!-- Static 10-20% opacity terminal graphics -->
+  <div class="terminal-decorations" aria-hidden="true">
+    <span>$</span><span>∞</span><span>█</span><span>[ ]</span><span>$</span>
+    <span>SYSTEM: READY</span>
+    <span>──────────────────────</span>
+  </div>
+
+  <!-- Terminal Authentication Loading Overlay -->
+  <div id="terminal-loader" class="terminal-loader-overlay" aria-hidden="true">
+    <canvas id="binary-canvas" class="binary-canvas"></canvas>
+    <div class="loader-crt-scanlines"></div>
+    <div class="terminal-loader-box">
+      <div class="terminal-loader-header">
+        <span class="status-dot"></span>
+        <span class="header-title">SYSTEM INITIALIZATION...</span>
+      </div>
+      <div class="terminal-loader-body">
+        <div class="status-stream" id="loader-status-stream">AUTHENTICATING USER...</div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="loader-progress-bar">[░░░░░░░░░░░░░░░░░░░░]</div>
+        </div>
+        <div class="system-processing-line">
+          <span id="loader-processing-text">SYSTEM PROCESSING</span><span class="blinking-cursor">█</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="auth-stage">
+    <!-- Simplified Hero Section -->
+    <section class="auth-hero">
+      <div class="dos-logo">
+        <span class="dos-logo-text">D-OS</span>
+      </div>
+
+      <p class="hero-tagline" style="letter-spacing: 0.14em; font-weight: 500;">MONEY OPERATING SYSTEM</p>
+      <div class="ascii-divider" aria-hidden="true">────────────────────────────</div>
+      <h1 class="hero-headline">Take Control of<br>Every Rupee.</h1>
+    </section>
+
+    <!-- Auth Form Section -->
+    <section class="auth-panel">
+      {% block auth_content %}{% endblock %}
+    </section>
+  </main>
+
+<script type="module" src="/static/js/firebase-auth.js"></script>
+</body>
+</html>
