@@ -107,6 +107,16 @@
   font-weight: 600;
 }
 
+.hero-powered-by {
+  font-family: var(--font-terminal);
+  color: var(--green-muted);
+  font-size: 0.95rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin: 0;
+  opacity: 0.85;
+}
+
 .ascii-divider {
   color: var(--border-color);
   font-size: 1rem;
@@ -435,6 +445,12 @@
   }
   .hero-tagline {
     font-size: 1.2rem;
+  }
+  .hero-powered-by {
+    font-size: 0.85rem;
+    letter-spacing: 0.14em;
+    margin-top: -0.15rem;
+    opacity: 0.8;
   }
   .hero-headline {
     display: none;
