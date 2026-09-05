@@ -94,7 +94,7 @@
   font-weight: 700;
   color: var(--green-primary);
   letter-spacing: 0.08em;
-  text-shadow: 0 0 10px rgba(102, 255, 153, 0.4);
+  text-shadow: 0 0 4px rgba(102, 255, 153, 0.28);
 }
 
 .hero-tagline {
@@ -368,7 +368,7 @@
   padding: 1.6rem 2.2rem;
   max-width: 440px;
   width: 90%;
-  box-shadow: 0 0 35px rgba(102, 255, 153, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85), 0 0 10px rgba(102, 255, 153, 0.15);
   font-family: var(--font-terminal);
 }
 .terminal-loader-header {
@@ -388,7 +388,7 @@
   height: 10px;
   border-radius: 50%;
   background: var(--green-primary);
-  box-shadow: 0 0 8px var(--green-primary);
+  box-shadow: 0 0 4px var(--green-primary);
   animation: dot-pulse 1s infinite alternate;
 }
 @keyframes dot-pulse {
@@ -407,7 +407,7 @@
   font-weight: 700;
   margin-bottom: 0.8rem;
   letter-spacing: 0.08em;
-  text-shadow: 0 0 8px rgba(102, 255, 153, 0.4);
+  text-shadow: 0 0 4px rgba(102, 255, 153, 0.28);
 }
 .system-processing-line {
   color: var(--green-muted);
@@ -508,9 +508,9 @@
   }
   .glass-form {
     padding: 1.35rem;
-    border-color: rgba(102, 255, 153, 0.5);
-    background: rgba(3, 13, 6, 0.9);
-    box-shadow: 0 0 24px rgba(102, 255, 153, 0.16);
+    border-color: rgba(102, 255, 153, 0.28);
+    background: rgba(3, 13, 6, 0.95);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.85);
   }
   .glass-form h2 {
     font-size: 2.1rem;

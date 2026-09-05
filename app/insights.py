@@ -55,7 +55,7 @@ def generate_smart_insights(
         elif diff_pct < Decimal("-5"):
             insights.append({
                 "type": "success",
-                "title": "Savings Growth",
+                "title": "Spending Reduction",
                 "message": f"Monthly spending decreased by {abs(diff_pct)}% compared to last month. Great pacing!"
             })
 
@@ -82,24 +82,7 @@ def generate_smart_insights(
                     "message": f"Keep remaining daily expenses under {currency}{daily_limit:,.0f}/day to stay inside your monthly budget."
                 })
 
-    # 3. Income vs Expense Savings Rate Tip (50-30-20 Rule)
-    if curr_income > Decimal("0"):
-        savings = curr_income - curr_expense
-        savings_rate = (savings / curr_income * Decimal("100")).quantize(Decimal("1"))
-        if savings_rate < Decimal("20"):
-            insights.append({
-                "type": "warning",
-                "title": "Savings Rate Warning",
-                "message": f"Current monthly savings rate is {savings_rate}%. Target at least 20% savings for financial health."
-            })
-        else:
-            insights.append({
-                "type": "success",
-                "title": "Solid Savings Rate",
-                "message": f"You are saving {savings_rate}% of your income this month. Excellent discipline!"
-            })
-
-    # 4. Category Overspending Insights
+    # 3. Category Overspending Insights
     categories = user.get("categories", [])
     category_totals: dict[str, Decimal] = {}
     for tx_item in _filter_transactions(rows, "expense"):

@@ -92,7 +92,7 @@ progress::-webkit-progress-bar {
 progress::-webkit-progress-value {
   background: var(--green);
   border-radius: 4px;
-  box-shadow: 0 0 8px rgba(102, 255, 153, 0.5);
+  box-shadow: 0 0 4px rgba(102, 255, 153, 0.25);
 }
 
 /* --- CRT Screen Overlay --- */
@@ -100,9 +100,9 @@ progress::-webkit-progress-value {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse at center, rgba(5, 20, 8, 0.25) 0%, rgba(2, 8, 4, 0.95) 100%),
-              repeating-linear-gradient(0deg, rgba(102, 255, 153, 0.015) 0 1px, transparent 1px 3px);
-  opacity: 0.35;
+  background: radial-gradient(ellipse at center, rgba(5, 20, 8, 0.15) 0%, rgba(2, 8, 4, 0.92) 100%),
+              repeating-linear-gradient(0deg, rgba(102, 255, 153, 0.008) 0 1px, transparent 1px 3px);
+  opacity: 0.22;
   z-index: 20;
 }
 
@@ -182,7 +182,7 @@ progress::-webkit-progress-value {
   font-size: 2.1rem;
   text-decoration: none;
   letter-spacing: 0.08em;
-  text-shadow: 0 0 10px rgba(102, 255, 153, 0.4);
+  text-shadow: 0 0 4px rgba(102, 255, 153, 0.28);
 }
 .logo-full {
   display: inline-flex;
@@ -351,7 +351,7 @@ progress::-webkit-progress-value {
   font-size: 2.2rem;
   color: #ffffff;
   letter-spacing: 0.04em;
-  text-shadow: 0 0 10px rgba(102, 255, 153, 0.25);
+  text-shadow: 0 0 4px rgba(102, 255, 153, 0.2);
   word-break: break-word;
 }
 .ascii-divider {
@@ -389,7 +389,7 @@ progress::-webkit-progress-value {
 .action-btn:hover {
   background: var(--panel-2);
   border-color: var(--green);
-  box-shadow: 0 0 10px rgba(102, 255, 153, 0.2);
+  box-shadow: 0 0 4px rgba(102, 255, 153, 0.15);
 }
 .action-btn.primary {
   border-color: var(--green);
@@ -413,7 +413,7 @@ progress::-webkit-progress-value {
   padding: 0.95rem 1.1rem;
   display: grid;
   gap: 0.35rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
   min-width: 0;
   overflow: hidden;
 }
@@ -430,19 +430,19 @@ progress::-webkit-progress-value {
   font-size: 1.85rem;
   color: var(--green);
   letter-spacing: 0.02em;
-  text-shadow: 0 0 8px rgba(102, 255, 153, 0.3);
+  text-shadow: 0 0 3px rgba(102, 255, 153, 0.25);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
 }
-.metric strong.good { color: var(--green); }
-.metric strong.bad { color: var(--red); text-shadow: 0 0 8px rgba(255, 85, 119, 0.3); }
+.metric strong.good { color: var(--green); text-shadow: 0 0 3px rgba(102, 255, 153, 0.25); }
+.metric strong.bad { color: var(--red); text-shadow: 0 0 3px rgba(255, 85, 119, 0.25); }
 
 .metric.metric-primary {
-  border-color: rgba(102, 255, 153, 0.45);
+  border-color: rgba(102, 255, 153, 0.35);
   background: rgba(4, 18, 9, 0.95);
-  box-shadow: 0 0 16px rgba(102, 255, 153, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 0 6px rgba(102, 255, 153, 0.04);
 }
 .metric.metric-primary span {
   font-size: 1.05rem;
@@ -453,7 +453,7 @@ progress::-webkit-progress-value {
 .metric.metric-primary .balance-figure {
   font-size: 2.2rem;
   color: #ffffff;
-  text-shadow: 0 0 12px rgba(102, 255, 153, 0.45);
+  text-shadow: 0 0 4px rgba(102, 255, 153, 0.3);
 }
 .metric-subtext {
   color: var(--green-dim);
@@ -470,7 +470,7 @@ progress::-webkit-progress-value {
   background: var(--panel);
   border-radius: 4px;
   padding: 1.25rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .panel-head {
@@ -1081,7 +1081,7 @@ details:not([open]) .edit-grid {
   border: 1px solid var(--green);
   border-radius: 4px;
   padding: 0.65rem 1rem;
-  box-shadow: 0 0 16px rgba(102, 255, 153, 0.35), inset 0 0 8px rgba(102, 255, 153, 0.1);
+  box-shadow: 0 0 8px rgba(102, 255, 153, 0.2), 0 4px 12px rgba(0, 0, 0, 0.7);
   font-family: "VT323", "IBM Plex Mono", monospace;
   color: var(--green);
   opacity: 0;
@@ -1098,12 +1098,12 @@ details:not([open]) .edit-grid {
 .terminal-activity-hud.slow {
   border-color: var(--amber);
   color: var(--amber);
-  box-shadow: 0 0 16px rgba(255, 230, 109, 0.35);
+  box-shadow: 0 0 8px rgba(255, 230, 109, 0.2), 0 4px 12px rgba(0, 0, 0, 0.7);
 }
 .terminal-activity-hud.warning {
   border-color: var(--red);
   color: var(--red);
-  box-shadow: 0 0 16px rgba(255, 85, 119, 0.4);
+  box-shadow: 0 0 8px rgba(255, 85, 119, 0.2), 0 4px 12px rgba(0, 0, 0, 0.7);
 }
 .hud-inner {
   display: flex;
@@ -1143,7 +1143,7 @@ a.submitting {
   pointer-events: none !important;
   border-color: var(--amber) !important;
   color: var(--amber) !important;
-  box-shadow: 0 0 8px rgba(255, 230, 109, 0.3);
+  box-shadow: 0 0 4px rgba(255, 230, 109, 0.25);
 }
 
 /* --- Unified Transaction Type Switcher --- */
@@ -1174,13 +1174,13 @@ a.submitting {
   background: rgba(255, 85, 119, 0.18);
   border-color: var(--red);
   color: #ffffff;
-  box-shadow: 0 0 10px rgba(255, 85, 119, 0.3);
+  box-shadow: 0 0 4px rgba(255, 85, 119, 0.25);
 }
 .type-toggle-btn.active[data-type-btn="income"] {
   background: rgba(102, 255, 153, 0.18);
   border-color: var(--green);
   color: #ffffff;
-  box-shadow: 0 0 10px rgba(102, 255, 153, 0.3);
+  box-shadow: 0 0 4px rgba(102, 255, 153, 0.2);
 }
 
 /* --- Visual Category Selector & Tiles Grid --- */
@@ -1219,7 +1219,7 @@ a.submitting {
   border-color: var(--green);
   background: rgba(102, 255, 153, 0.18);
   color: #ffffff;
-  box-shadow: 0 0 10px rgba(102, 255, 153, 0.35);
+  box-shadow: 0 0 4px rgba(102, 255, 153, 0.2);
 }
 .cat-icon-badge {
   display: inline-flex;
@@ -1288,7 +1288,7 @@ a.submitting {
   border-radius: 4px;
   width: 100%;
   max-width: 540px;
-  box-shadow: 0 0 24px rgba(102, 255, 153, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85), 0 0 8px rgba(102, 255, 153, 0.15);
   padding: 1.35rem;
 }
 .terminal-modal-head {
@@ -1395,7 +1395,7 @@ a.submitting {
   border-color: var(--green);
   background: rgba(102, 255, 153, 0.1);
   transform: translateY(-2px);
-  box-shadow: 0 0 16px rgba(102, 255, 153, 0.2);
+  box-shadow: 0 0 8px rgba(102, 255, 153, 0.15);
 }
 
 .quick-tile-icon {
@@ -1557,7 +1557,7 @@ a.submitting {
 .help-search-bar input:focus {
   border-color: var(--green);
   outline: none;
-  box-shadow: 0 0 12px rgba(102, 255, 153, 0.2);
+  box-shadow: 0 0 6px rgba(102, 255, 153, 0.15);
 }
 
 .help-section {
@@ -1683,7 +1683,7 @@ a.submitting {
   border: 1px solid var(--green);
   border-radius: 8px;
   padding: 1.75rem;
-  box-shadow: 0 0 30px rgba(102, 255, 153, 0.25), inset 0 0 20px rgba(102, 255, 153, 0.05);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.85), 0 0 10px rgba(102, 255, 153, 0.15);
 }
 
 .onboarding-step {
@@ -1739,8 +1739,8 @@ a.submitting {
   }
   .terminal-body {
     background:
-      linear-gradient(rgba(102, 255, 153, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(102, 255, 153, 0.018) 1px, transparent 1px),
+      linear-gradient(rgba(102, 255, 153, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(102, 255, 153, 0.01) 1px, transparent 1px),
       var(--bg);
     background-size: 18px 18px;
   }
@@ -1754,8 +1754,8 @@ a.submitting {
     gap: 0.5rem;
     width: 100%;
     max-width: 100%;
-    border-color: rgba(102, 255, 153, 0.45);
-    box-shadow: 0 0 18px rgba(102, 255, 153, 0.08);
+    border-color: rgba(102, 255, 153, 0.25);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
   }
   .top-nav-main {
     width: auto;
@@ -1818,8 +1818,8 @@ a.submitting {
     gap: 0;
     padding: 0.35rem 0.25rem max(0.45rem, env(safe-area-inset-bottom));
     background: rgba(2, 8, 4, 0.98);
-    border-top: 1px solid rgba(102, 255, 153, 0.4);
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.85);
+    border-top: 1px solid rgba(102, 255, 153, 0.25);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.9);
     box-sizing: border-box;
   }
   .mobile-bottom-nav a,
@@ -1853,7 +1853,7 @@ a.submitting {
     color: #ffffff !important;
     background: rgba(102, 255, 153, 0.16) !important;
     transform: translateY(-0.4rem);
-    box-shadow: 0 0 16px rgba(102, 255, 153, 0.3);
+    box-shadow: 0 0 8px rgba(102, 255, 153, 0.22), 0 2px 6px rgba(0, 0, 0, 0.6);
     min-height: 50px !important;
   }
 
@@ -1889,8 +1889,8 @@ a.submitting {
   }
   .terminal-panel {
     border-radius: 6px;
-    border-color: rgba(102, 255, 153, 0.38);
-    background: rgba(3, 13, 6, 0.88);
+    border-color: rgba(102, 255, 153, 0.25);
+    background: rgba(3, 13, 6, 0.92);
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
@@ -1898,8 +1898,8 @@ a.submitting {
   }
   .metric {
     border-radius: 6px;
-    border-color: rgba(102, 255, 153, 0.38);
-    background: rgba(3, 13, 6, 0.88);
+    border-color: rgba(102, 255, 153, 0.25);
+    background: rgba(3, 13, 6, 0.92);
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
