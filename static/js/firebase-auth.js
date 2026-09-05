@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/fireba
 import {
   createUserWithEmailAndPassword,
   browserLocalPersistence,
+  browserSessionPersistence,
   getAuth,
   GoogleAuthProvider,
   sendPasswordResetEmail,
@@ -152,14 +153,14 @@ function hideTerminalLoader() {
   if (progressBarAnimId) clearTimeout(progressBarAnimId);
 }
 
-async function createServerSession(idToken) {
+async function createServerSession(idToken, rememberMe = false) {
   const response = await fetch("/session-login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-CSRF-Token": decodeURIComponent(getCookie("dos_csrf") || ""),
     },
-    body: JSON.stringify({ idToken }),
+    body: JSON.stringify({ idToken, rememberMe }),
   });
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
@@ -192,12 +193,14 @@ async function boot() {
     const data = new FormData(form);
     const email = String(data.get("email") || "").trim();
     const password = String(data.get("password") || "");
+    const rememberMe = Boolean(form.querySelector('[name="remember_me"]')?.checked);
     try {
       if (mode === "login") {
         showTerminalLoader("AUTHENTICATING USER...");
+        await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
         const credential = await signInWithEmailAndPassword(auth, email, password);
         const idToken = await credential.user.getIdToken();
-        await createServerSession(idToken);
+        await createServerSession(idToken, rememberMe);
         window.location.assign("/");
       }
       if (mode === "register") {
@@ -208,7 +211,7 @@ async function boot() {
         const credential = await createUserWithEmailAndPassword(auth, email, password);
         if (username) await updateProfile(credential.user, { displayName: username });
         const idToken = await credential.user.getIdToken();
-        await createServerSession(idToken);
+        await createServerSession(idToken, true);
         window.location.assign("/");
       }
       if (mode === "forgot") {
@@ -226,10 +229,12 @@ async function boot() {
   form.querySelectorAll("[data-google-login]").forEach((button) => {
     button.addEventListener("click", async () => {
       try {
+        const rememberMe = Boolean(form.querySelector('[name="remember_me"]')?.checked);
         showTerminalLoader("AUTHENTICATING GOOGLE OAUTH...");
+        await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
         const credential = await signInWithPopup(auth, new GoogleAuthProvider());
         const idToken = await credential.user.getIdToken();
-        await createServerSession(idToken);
+        await createServerSession(idToken, rememberMe);
         window.location.assign("/");
       } catch (error) {
         hideTerminalLoader();

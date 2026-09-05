@@ -79,13 +79,13 @@
       <tbody>
         {% for plan in plans %}
         <tr>
-          <td>{{ plan.name }}</td>
-          <td>{{ plan.kind|replace('_', ' ')|title }}</td>
-          <td>{{ plan.initial_amount|money(current_user.currency) }}</td>
-          <td>{{ plan.monthly_investment|money(current_user.currency) }}</td>
-          <td>{{ plan.interest_rate }}%</td>
-          <td>{{ plan.years }}</td>
-          <td><form method="post" action="/investment/plans/{{ plan.id }}/delete"><button>⌫</button></form></td>
+          <td data-label="Name"><strong>{{ plan.name }}</strong></td>
+          <td data-label="Kind">{{ plan.kind|replace('_', ' ')|title }}</td>
+          <td data-label="Initial">{{ plan.initial_amount|money(current_user.currency) }}</td>
+          <td data-label="Monthly">{{ plan.monthly_investment|money(current_user.currency) }}</td>
+          <td data-label="Interest">{{ plan.interest_rate }}%</td>
+          <td data-label="Years">{{ plan.years }}</td>
+          <td data-label="Action"><form method="post" action="/investment/plans/{{ plan.id }}/delete"><button class="link-danger">⌫</button></form></td>
         </tr>
         {% else %}
         <tr><td colspan="7" class="empty-cell">No saved plans.</td></tr>

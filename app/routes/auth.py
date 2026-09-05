@@ -76,10 +76,11 @@ async def session_login(request: Request):
     payload = await request.json()
     require_csrf(request, request.headers.get("X-CSRF-Token", ""))
     id_token = str(payload.get("idToken", ""))
+    remember_me = bool(payload.get("rememberMe", False))
     if not id_token:
         return JSONResponse({"detail": "Missing Firebase ID token"}, status_code=400)
     try:
-        session_cookie, claims = create_session_cookie(id_token)
+        session_cookie, claims = create_session_cookie(id_token, remember_me=remember_me)
         ensure_user_profile(
             uid=str(claims["uid"]),
             email=str(claims.get("email", "")),
@@ -89,20 +90,41 @@ async def session_login(request: Request):
         logging.error("session-login failed: %s", exc)
         return JSONResponse({"detail": "Authentication failed. Please try again."}, status_code=401)
     response = JSONResponse({"status": "success"})
-    response.set_cookie(
-        settings.session_cookie_name,
-        session_cookie,
-        httponly=True,
-        secure=settings.is_production,
-        samesite="lax",
-        max_age=settings.session_days * 24 * 60 * 60,
-    )
+    if remember_me:
+        response.set_cookie(
+            settings.session_cookie_name,
+            session_cookie,
+            httponly=True,
+            secure=settings.is_production,
+            samesite="lax",
+            max_age=settings.session_days * 24 * 60 * 60,
+        )
+    else:
+        response.set_cookie(
+            settings.session_cookie_name,
+            session_cookie,
+            httponly=True,
+            secure=settings.is_production,
+            samesite="lax",
+        )
     return response
 
 
 @router.post("/logout")
 @router.get("/logout")
-def logout():
+def logout(request: Request):
+    session_cookie = request.cookies.get(settings.session_cookie_name)
+    if session_cookie:
+        try:
+            from firebase_admin import auth as fb_admin_auth
+            from app.firebase.auth import verify_session_cookie
+            from app.firebase.firebase import get_firebase_app
+            claims = verify_session_cookie(session_cookie)
+            uid = str(claims.get("uid", ""))
+            if uid:
+                fb_admin_auth.revoke_refresh_tokens(uid, app=get_firebase_app())
+        except Exception:
+            pass
     response = RedirectResponse("/login", status_code=303)
     response.delete_cookie(settings.session_cookie_name)
     response.delete_cookie(CSRF_COOKIE)

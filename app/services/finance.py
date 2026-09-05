@@ -272,6 +272,9 @@ def dashboard_data(user: dict[str, Any], data: dict[str, Any] | None = None) -> 
     today_income = _sum_from_rows(rows, "income", exact_day=today)
     monthly_expense = _sum_from_rows(rows, "expense", month_start, month_end)
     monthly_income = _sum_from_rows(rows, "income", month_start, month_end)
+    total_income = _sum_from_rows(rows, "income")
+    total_expense = _sum_from_rows(rows, "expense")
+    available_balance = total_income - total_expense
     remaining_budget = max(to_decimal(user.get("monthly_budget")) - monthly_expense, ZERO)
     active_goals = [goal for goal in goals if goal.get("status", "active") == "active"]
     receive = sum(to_decimal(item.get("amount")) for item in debts if item.get("direction") == "lend" and item.get("status") == "pending")
@@ -279,12 +282,15 @@ def dashboard_data(user: dict[str, Any], data: dict[str, Any] | None = None) -> 
     recent = rows[:8]
     tips = smart_tips(user, month_start, month_end, _rows=rows, _goals=goals, _recurring=recurring)
     return {
+        "available_balance": available_balance,
+        "total_income": total_income,
+        "total_expense": total_expense,
         "today_expense": today_expense,
         "today_income": today_income,
         "monthly_expense": monthly_expense,
         "monthly_income": monthly_income,
         "remaining_budget": remaining_budget,
-        "savings": monthly_income - monthly_expense,
+        "savings": available_balance,
         "active_goals": len(active_goals),
         "money_to_receive": receive,
         "money_to_pay": pay,
@@ -360,7 +366,7 @@ def chart_data(user: dict[str, Any], data: dict[str, Any] | None = None) -> dict
             label = str((tx_item.get("category") or {}).get("name") or "Uncategorized")
             category[label] += to_decimal(tx_item.get("amount"))
             weekdays[d.strftime("%a")] += to_decimal(tx_item.get("amount"))
-        if d >= today - timedelta(days=6) and kind == "expense":
+        if d >= today - timedelta(days=13) and kind == "expense":
             daily[d.strftime("%d %b")] += to_decimal(tx_item.get("amount"))
         if d >= today - timedelta(days=27) and kind == "expense":
             week_key = f"W{((today - d).days // 7) + 1}"
@@ -369,10 +375,19 @@ def chart_data(user: dict[str, Any], data: dict[str, Any] | None = None) -> dict
             heatmap[d.isoformat()] += to_decimal(tx_item.get("amount"))
 
     all_time_category: dict[str, Decimal] = defaultdict(Decimal)
+    income_category: dict[str, Decimal] = defaultdict(Decimal)
+    all_time_income_category: dict[str, Decimal] = defaultdict(Decimal)
     for tx_item in rows:
-        if str(tx_item.get("type", "")).lower() == "expense":
-            cat_name = str((tx_item.get("category") or {}).get("name") or "Uncategorized")
-            all_time_category[cat_name] += to_decimal(tx_item.get("amount"))
+        raw_kind = str(tx_item.get("type", "")).lower()
+        cat_name = str((tx_item.get("category") or {}).get("name") or "Uncategorized")
+        amt = to_decimal(tx_item.get("amount"))
+        if raw_kind == "expense":
+            all_time_category[cat_name] += amt
+        elif raw_kind == "income":
+            all_time_income_category[cat_name] += amt
+            d = tx_date(tx_item)
+            if month_start <= d < month_end:
+                income_category[cat_name] += amt
 
     month_items = list(monthly.items())[-8:]
     goals = data["goals"]
@@ -398,6 +413,21 @@ def chart_data(user: dict[str, Any], data: dict[str, Any] | None = None) -> dict
     for i, (label, total) in enumerate(category_sorted):
         pct_val = (total / cat_total * Decimal("100")) if cat_total > ZERO else Decimal("0")
         category_list.append({
+            "name": label,
+            "amount": as_float(total),
+            "pct": f"{pct_val:.1f}%",
+            "color": palette[i % len(palette)],
+        })
+
+    active_income_cat = income_category if sum(income_category.values()) > ZERO else all_time_income_category
+    income_cat_sorted = sorted(active_income_cat.items(), key=lambda item: item[1], reverse=True)
+    income_cat_total = sum(active_income_cat.values())
+    has_income_cat_data = income_cat_total > ZERO and len(income_cat_sorted) > 0
+
+    income_cat_list = []
+    for i, (label, total) in enumerate(income_cat_sorted):
+        pct_val = (total / income_cat_total * Decimal("100")) if income_cat_total > ZERO else Decimal("0")
+        income_cat_list.append({
             "name": label,
             "amount": as_float(total),
             "pct": f"{pct_val:.1f}%",
@@ -483,6 +513,37 @@ def chart_data(user: dict[str, Any], data: dict[str, Any] | None = None) -> dict
                     "backgroundColor": [item["color"] for item in category_list],
                     "borderColor": "#020804",
                     "borderWidth": 2,
+                }
+            ],
+        },
+        "income_sources": {
+            "labels": [label for label, _ in income_cat_sorted],
+            "values": [as_float(total) for _, total in income_cat_sorted],
+            "total": as_float(income_cat_total),
+            "category_list": income_cat_list,
+            "has_data": has_income_cat_data,
+            "datasets": [
+                {
+                    "label": "Income Sources",
+                    "data": [as_float(total) for _, total in income_cat_sorted],
+                    "backgroundColor": [item["color"] for item in income_cat_list],
+                    "borderColor": "#020804",
+                    "borderWidth": 2,
+                }
+            ],
+        },
+        "spending_over_time": {
+            "labels": [(today - timedelta(days=offset)).strftime("%d %b") for offset in range(13, -1, -1)],
+            "values": [as_float(daily[(today - timedelta(days=offset)).strftime("%d %b")]) for offset in range(13, -1, -1)],
+            "has_data": any(daily.values()),
+            "datasets": [
+                {
+                    "label": "Daily Spending",
+                    "data": [as_float(daily[(today - timedelta(days=offset)).strftime("%d %b")]) for offset in range(13, -1, -1)],
+                    "borderColor": "#ff5577",
+                    "backgroundColor": "rgba(255, 85, 119, 0.15)",
+                    "borderWidth": 2,
+                    "fill": True,
                 }
             ],
         },

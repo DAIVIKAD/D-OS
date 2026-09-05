@@ -19,14 +19,15 @@ def make_csrf_token() -> str:
     return secrets.token_urlsafe(32)
 
 
-def create_session_cookie(id_token: str) -> tuple[str, dict[str, Any]]:
+def create_session_cookie(id_token: str, remember_me: bool = True) -> tuple[str, dict[str, Any]]:
     app = get_firebase_app()
     decoded = auth.verify_id_token(id_token, app=app)
     if time.time() - int(decoded.get("auth_time", 0)) > 5 * 60:
         raise ValueError("Recent sign-in required")
+    expires_in = timedelta(days=settings.session_days) if remember_me else timedelta(days=1)
     session_cookie = auth.create_session_cookie(
         id_token,
-        expires_in=timedelta(days=settings.session_days),
+        expires_in=expires_in,
         app=app,
     )
     return session_cookie, decoded

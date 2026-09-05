@@ -402,6 +402,8 @@ progress::-webkit-progress-value {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 0.85rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .metric {
@@ -412,18 +414,54 @@ progress::-webkit-progress-value {
   display: grid;
   gap: 0.35rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  min-width: 0;
+  overflow: hidden;
 }
 .metric span {
   color: var(--green-dim);
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .metric strong {
   font-size: 1.85rem;
   color: var(--green);
   letter-spacing: 0.02em;
   text-shadow: 0 0 8px rgba(102, 255, 153, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.metric strong.good { color: var(--green); }
+.metric strong.bad { color: var(--red); text-shadow: 0 0 8px rgba(255, 85, 119, 0.3); }
+
+.metric.metric-primary {
+  border-color: rgba(102, 255, 153, 0.45);
+  background: rgba(4, 18, 9, 0.95);
+  box-shadow: 0 0 16px rgba(102, 255, 153, 0.12);
+}
+.metric.metric-primary span {
+  font-size: 1.05rem;
+  color: var(--green-bright);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+.metric.metric-primary .balance-figure {
+  font-size: 2.2rem;
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(102, 255, 153, 0.45);
+}
+.metric-subtext {
+  color: var(--green-dim);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* --- Panels & Dashboard Layout --- */
@@ -439,7 +477,8 @@ progress::-webkit-progress-value {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.65rem;
   margin-bottom: 1.1rem;
 }
 .panel-kicker {
@@ -700,7 +739,7 @@ progress::-webkit-progress-value {
 /* --- Chart Grid (Reports) --- */
 .chart-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 1.35rem;
 }
 .chart-grid.two {
@@ -868,7 +907,8 @@ progress::-webkit-progress-value {
   position: absolute;
   top: 100%;
   right: 0;
-  width: 380px;
+  width: min(380px, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
   max-height: 440px;
   overflow-y: auto;
   z-index: 60;
@@ -1010,6 +1050,14 @@ progress::-webkit-progress-value {
   color: var(--green);
 }
 .row-actions details { position: relative; }
+details:not([open]) > :not(summary),
+details:not([open]) form,
+details:not([open]) .edit-grid {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
 .row-actions details[open] > summary + * {
   position: absolute;
   right: 0;
@@ -1019,7 +1067,8 @@ progress::-webkit-progress-value {
   border-radius: 4px;
   padding: 0.85rem;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
-  min-width: 300px;
+  min-width: min(280px, 88vw);
+  max-width: calc(100vw - 2rem);
 }
 
 /* --- Global Terminal Activity & Loading Feedback HUD --- */
@@ -1747,10 +1796,11 @@ a.submitting {
 
   /* Workspace full width with safe bottom clearance */
   .workspace {
-    padding: 0.85rem 0.85rem 7rem;
+    padding: 0.85rem 0.85rem max(7.5rem, calc(5.5rem + env(safe-area-inset-bottom)));
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    min-width: 0;
   }
 
   /* Fixed Mobile Bottom Navigation */
@@ -1807,20 +1857,23 @@ a.submitting {
     min-height: 50px !important;
   }
 
-  /* Layout grids stack gracefully */
-  .dashboard-layout {
-    grid-template-columns: 1fr;
-  }
+  /* All desktop 2-column and multi-column grids collapse gracefully */
+  .dashboard-layout,
+  .investment-layout,
+  .report-layout,
+  .report-grid,
+  .debt-grid,
+  .goal-grid,
+  .chart-grid,
+  .chart-grid.two,
   .doughnut-with-legend,
-  .budget-progress-dashboard {
-    grid-template-columns: 1fr;
+  .budget-progress-dashboard,
+  .recurring-stats-grid,
+  .secondary-tools-layout {
+    grid-template-columns: 1fr !important;
   }
-  .chart-grid.two {
-    grid-template-columns: 1fr;
-  }
-  .quick-actions-bar,
-  .dashboard-advisor-panel,
-  .investment-widget {
+
+  .quick-actions-bar {
     display: none;
   }
   .mobile-settings-logout {
@@ -1829,7 +1882,20 @@ a.submitting {
   .terminal-page-header h1 {
     font-size: 1.85rem;
   }
-  .terminal-panel,
+  .warning-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+  .terminal-panel {
+    border-radius: 6px;
+    border-color: rgba(102, 255, 153, 0.38);
+    background: rgba(3, 13, 6, 0.88);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+  }
   .metric {
     border-radius: 6px;
     border-color: rgba(102, 255, 153, 0.38);
@@ -1837,13 +1903,25 @@ a.submitting {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    min-width: 0;
+    padding: 0.65rem 0.75rem;
+  }
+  .metric strong {
+    font-size: clamp(1.2rem, 4.2vw, 1.65rem);
   }
   .metric-grid {
     grid-template-columns: 1fr 1fr;
     gap: 0.65rem;
+    width: 100%;
+    min-width: 0;
   }
-  .metric-grid .metric:first-child {
+  .metric-grid .metric:first-child,
+  .metric-grid .metric.metric-primary {
     grid-column: 1 / -1;
+    padding: 0.85rem 0.95rem;
+  }
+  .metric.metric-primary .balance-figure {
+    font-size: clamp(1.75rem, 6.5vw, 2.3rem);
   }
   .goal-stats-grid {
     grid-template-columns: 1fr;
@@ -1918,8 +1996,107 @@ a.submitting {
   }
 }
 
+/* --- Deliberate Mobile Representation for Terminal Tables (<= 640px) --- */
+@media (max-width: 640px) {
+  .table-wrap {
+    overflow-x: visible;
+    width: 100%;
+    min-width: 0;
+  }
+  .terminal-table {
+    display: block;
+    width: 100%;
+    border-collapse: separate;
+  }
+  .terminal-table thead {
+    display: none;
+  }
+  .terminal-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    width: 100%;
+  }
+  .terminal-table tr {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--line-soft);
+    border-radius: 6px;
+    background: rgba(3, 14, 7, 0.75);
+    padding: 0.75rem 0.85rem;
+    margin-bottom: 0;
+  }
+  .terminal-table tr:hover {
+    border-color: var(--line);
+    background: rgba(5, 20, 10, 0.9);
+  }
+  .terminal-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid rgba(102, 255, 153, 0.08);
+    font-size: 1.1rem;
+    word-break: break-word;
+    min-width: 0;
+    color: #ffffff;
+  }
+  .terminal-table td:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .terminal-table td::before {
+    content: attr(data-label);
+    color: var(--green-dim);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-right: 0.6rem;
+  }
+  .terminal-table td.row-actions,
+  .terminal-table td[data-label="Action"],
+  .terminal-table td[data-label="Actions"] {
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 0.4rem;
+  }
+  .terminal-table td.empty-cell {
+    display: block;
+    text-align: center;
+    border: none;
+    padding: 1.5rem;
+    color: var(--green-dim);
+  }
+  .terminal-table td.empty-cell::before {
+    display: none;
+  }
+}
+
 /* --- Narrow Mobile (<= 400px: iPhone SE, 360px Android) --- */
 @media (max-width: 400px) {
+  .metric-grid {
+    gap: 0.5rem;
+  }
+  .metric {
+    padding: 0.55rem 0.65rem;
+  }
+  .metric span {
+    font-size: 0.82rem;
+  }
+  .metric strong {
+    font-size: 1.25rem;
+  }
+  .metric.metric-primary .balance-figure {
+    font-size: 1.85rem;
+  }
+  .terminal-panel {
+    padding: 0.85rem;
+  }
   .more-quick-grid {
     gap: 0.55rem;
   }
@@ -1931,28 +2108,31 @@ a.submitting {
     margin-bottom: 0.2rem;
   }
   .quick-tile-title {
-    font-size: 0.98rem;
+    font-size: 0.95rem;
   }
   .quick-tile-sub {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
   }
   .more-nav-item {
-    padding: 0.75rem 0.85rem;
-    gap: 0.65rem;
+    padding: 0.65rem 0.75rem;
+    gap: 0.55rem;
   }
   .more-nav-icon {
-    width: 30px;
-    height: 30px;
-    font-size: 1.15rem;
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
   }
   .more-nav-text strong {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
+  }
+  .more-nav-text span {
+    font-size: 0.88rem;
   }
   .mobile-bottom-nav a,
   .mobile-bottom-nav button {
     font-size: 1.15rem;
   }
   .mobile-bottom-nav b {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
   }
 }

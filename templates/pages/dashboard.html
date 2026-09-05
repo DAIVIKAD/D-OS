@@ -22,18 +22,23 @@
 </section>
 {% endif %}
 
-<!-- Summary Cards -->
-<section class="metric-grid">
-  <article class="metric"><span>Today's Expense</span><strong>{{ dashboard.today_expense|money(current_user.currency) }}</strong></article>
+<!-- Summary Cards: Primary Available Balance, Secondary Income & Expense -->
+<section class="metric-grid dashboard-metrics">
+  <article class="metric metric-primary">
+    <span>AVAILABLE BALANCE</span>
+    <strong class="balance-figure">{{ dashboard.available_balance|money(current_user.currency) }}</strong>
+    <small class="metric-subtext">Net Funds (Total Income - Total Expenses)</small>
+  </article>
+  <article class="metric"><span>Total Income</span><strong class="good">{{ dashboard.total_income|money(current_user.currency) }}</strong></article>
+  <article class="metric"><span>Total Expenses</span><strong class="bad">{{ dashboard.total_expense|money(current_user.currency) }}</strong></article>
   <article class="metric"><span>Monthly Expense</span><strong>{{ dashboard.monthly_expense|money(current_user.currency) }}</strong></article>
-  <article class="metric"><span>Savings</span><strong>{{ dashboard.savings|money(current_user.currency) }}</strong></article>
   <article class="metric"><span>Remaining Budget</span><strong>{{ dashboard.remaining_budget|money(current_user.currency) }}</strong></article>
   <article class="metric"><span>Active Goals</span><strong>{{ dashboard.active_goals }}</strong></article>
   <article class="metric"><span>Need To Receive</span><strong>{{ dashboard.money_to_receive|money(current_user.currency) }}</strong></article>
   <article class="metric"><span>Need To Pay</span><strong>{{ dashboard.money_to_pay|money(current_user.currency) }}</strong></article>
 </section>
 
-<!-- Dashboard Main Layout -->
+<!-- Dashboard Main Layout: Flow Analysis & Insights -->
 <section class="dashboard-layout">
   <!-- Chart Panel with Blinking Warning Badge -->
   <div class="terminal-panel">
@@ -78,7 +83,48 @@
   </div>
 </section>
 
+<!-- Recent Transactions Table (Prominent Primary View) -->
 <section class="dashboard-layout">
+  <div class="terminal-panel full-width">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">Ledger</p>
+        <h2>Recent Transactions</h2>
+      </div>
+      <a href="/money">Full Transactions Ledger</a>
+    </div>
+    {% set rows = dashboard.recent_transactions %}
+    {% include "partials/transaction_table.html" %}
+  </div>
+</section>
+
+<!-- Secondary Tools: Goals & Investment Calculator -->
+<section class="dashboard-layout secondary-tools-layout">
+  <!-- Active Goals Progress -->
+  <div class="terminal-panel">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">Goals</p>
+        <h2>Active Goals</h2>
+      </div>
+      <a href="/goals">View All</a>
+    </div>
+    <div class="mini-goals">
+      {% for goal in dashboard.goal_cards %}
+        <div class="mini-goal">
+          <div>
+            <strong>{{ goal.name }}</strong>
+            <span>{{ goal.remaining|money(current_user.currency) }} left</span>
+            <progress max="100" value="{{ goal.progress }}"></progress>
+          </div>
+          <b>{{ goal.progress|pct }}</b>
+        </div>
+      {% else %}
+        <p class="muted">No active goals configured.</p>
+      {% endfor %}
+    </div>
+  </div>
+
   <!-- Embedded Investment Calculator Widget -->
   <div class="terminal-panel investment-widget">
     <div class="panel-head">
@@ -112,46 +158,6 @@
     <div id="widget-calc-results" class="calc-results-output">
       <p class="muted">Enter values and click Calculate to view projected maturity wealth.</p>
     </div>
-  </div>
-
-  <!-- Active Goals Progress -->
-  <div class="terminal-panel">
-    <div class="panel-head">
-      <div>
-        <p class="panel-kicker">Goals</p>
-        <h2>Active Goals</h2>
-      </div>
-      <a href="/goals">View All</a>
-    </div>
-    <div class="mini-goals">
-      {% for goal in dashboard.goal_cards %}
-        <div class="mini-goal">
-          <div>
-            <strong>{{ goal.name }}</strong>
-            <span>{{ goal.remaining|money(current_user.currency) }} left</span>
-            <progress max="100" value="{{ goal.progress }}"></progress>
-          </div>
-          <b>{{ goal.progress|pct }}</b>
-        </div>
-      {% else %}
-        <p class="muted">No active goals configured.</p>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-<section class="dashboard-layout">
-  <!-- Recent Transactions Table -->
-  <div class="terminal-panel full-width">
-    <div class="panel-head">
-      <div>
-        <p class="panel-kicker">Ledger</p>
-        <h2>Recent Transactions</h2>
-      </div>
-      <a href="/money">Full Transactions Ledger</a>
-    </div>
-    {% set rows = dashboard.recent_transactions %}
-    {% include "partials/transaction_table.html" %}
   </div>
 </section>
 {% endblock %}

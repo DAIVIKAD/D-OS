@@ -63,6 +63,8 @@
 .auth-stage {
   position: relative;
   z-index: 5;
+  width: 100%;
+  box-sizing: border-box;
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
@@ -201,6 +203,55 @@
 }
 .glass-form input:focus {
   border-color: var(--border-focus);
+}
+
+/* Remember Me Checkbox */
+.remember-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.65rem;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--font-terminal);
+  color: var(--green-muted);
+  font-size: 1.15rem;
+  padding: 0.15rem 0;
+  letter-spacing: 0.04em;
+}
+.remember-row input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  border: 1px solid var(--border-color);
+  background: rgba(2, 8, 4, 0.8);
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  place-content: center;
+  transition: all 0.15s ease;
+}
+.remember-row input[type="checkbox"]:checked {
+  background: rgba(102, 255, 153, 0.2);
+  border-color: var(--green-primary);
+}
+.remember-row input[type="checkbox"]:checked::after {
+  content: "✓";
+  color: var(--green-primary);
+  font-size: 15px;
+  font-family: var(--font-terminal);
+  font-weight: bold;
+}
+.remember-row:hover {
+  color: var(--green-primary);
+}
+.remember-row:hover input[type="checkbox"] {
+  border-color: var(--green-primary);
 }
 
 /* Buttons */

@@ -66,7 +66,7 @@
 <!-- Power BI Style Multi-Column Balanced Dashboard Layout -->
 <section class="pbi-dashboard-grid">
 
-  <!-- ROW 1: Monthly Income vs Expense (Full Span Hero Chart) -->
+  <!-- ROW 1: Monthly Income vs Expense (Priority 1: Flow Analysis Hero Chart) -->
   <article class="terminal-panel chart-panel full-span">
     <div class="panel-head">
       <div>
@@ -88,12 +88,12 @@
     {% endif %}
   </article>
 
-  <!-- ROW 2: Expense Allocation (1/2) + Savings Trajectory (1/2) -->
+  <!-- ROW 2: Priority 2 (Expense by Category) + Priority 4 (Income Sources) -->
   <article class="terminal-panel chart-panel half-span">
     <div class="panel-head">
       <div>
         <p class="panel-kicker">CATEGORY BREAKDOWN</p>
-        <h2>Expense Allocation</h2>
+        <h2>Expense by Category</h2>
       </div>
     </div>
     {% if not charts.category_pie.has_data %}
@@ -124,25 +124,75 @@
   <article class="terminal-panel chart-panel half-span">
     <div class="panel-head">
       <div>
-        <p class="panel-kicker">TREND ANALYSIS</p>
-        <h2>Savings Trajectory</h2>
+        <p class="panel-kicker">INCOME BREAKDOWN</p>
+        <h2>Income Sources</h2>
       </div>
     </div>
-    {% if not charts.savings_trajectory.has_data %}
+    {% if not charts.income_sources.has_data %}
       <div class="chart-empty-state">
-        <p class="panel-kicker">INSUFFICIENT DATA FOR TREND</p>
-        <p class="muted">Record income and expenses across multiple months to track savings trend.</p>
+        <p class="panel-kicker">NO INCOME SOURCE DATA</p>
+        <p class="muted">Add income transactions to track your income channels.</p>
+        <a class="dos-btn ghost" href="/income" style="margin-top: 0.5rem;">+ Add Income</a>
       </div>
     {% else %}
-      <canvas data-chart="line" data-x-title="Month" data-y-title="Net Savings (₹)" data-payload='{{ charts.savings_trajectory|tojson }}'></canvas>
+      <div class="doughnut-with-legend">
+        <div class="doughnut-canvas-wrap">
+          <canvas data-chart="doughnut" data-payload='{{ charts.income_sources|tojson }}'></canvas>
+        </div>
+        <div class="category-legend-list">
+          {% for item in charts.income_sources.category_list[:6] %}
+          <div class="category-legend-row">
+            <span class="swatch" style="--swatch: {{ item.color }};"></span>
+            <span class="category-name">{{ item.name }}</span>
+            <span class="category-amount">{{ item.amount|money(current_user.currency) }}</span>
+            <span class="category-pct">({{ item.pct }})</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
     {% endif %}
   </article>
 
-  <!-- ROW 3: Monthly Budget Progress (Full Span Hero Card) -->
+  <!-- ROW 3: Priority 3 (Spending Over Time) + Priority 5 (Cumulative Cash Flow) -->
+  <article class="terminal-panel chart-panel half-span">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">SPENDING TRAJECTORY</p>
+        <h2>Spending Over Time</h2>
+      </div>
+    </div>
+    {% if not charts.spending_over_time.has_data %}
+      <div class="chart-empty-state">
+        <p class="panel-kicker">NO SPENDING DATA</p>
+        <p class="muted">Record expenses across days to track spending timeline.</p>
+      </div>
+    {% else %}
+      <canvas data-chart="line" data-x-title="Date" data-y-title="Daily Spending (₹)" data-payload='{{ charts.spending_over_time|tojson }}'></canvas>
+    {% endif %}
+  </article>
+
+  <article class="terminal-panel chart-panel half-span">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">CASH FLOW MATRIX</p>
+        <h2>Cumulative Cash Flow</h2>
+      </div>
+    </div>
+    {% if not charts.cumulative_cash_flow.has_data %}
+      <div class="chart-empty-state">
+        <p class="panel-kicker">NO CASH FLOW DATA</p>
+        <p class="muted">Add transactions to generate cumulative cash flow timeline.</p>
+      </div>
+    {% else %}
+      <canvas data-chart="line" data-x-title="Timeline" data-y-title="Cumulative Balance (₹)" data-payload='{{ charts.cumulative_cash_flow|tojson }}'></canvas>
+    {% endif %}
+  </article>
+
+  <!-- ROW 4: Budget Analytics (Secondary Priority) -->
   <article class="terminal-panel chart-panel full-span">
     <div class="panel-head">
       <div>
-        <p class="panel-kicker">BUDGET ALLOCATION &amp; USAGE</p>
+        <p class="panel-kicker">BUDGET ALLOCATION &amp; USAGE (SECONDARY)</p>
         <h2>Monthly Budget Progress</h2>
       </div>
       {% if charts.budget_progress.has_budget %}
@@ -183,30 +233,14 @@
     {% endif %}
   </article>
 
-  <!-- ROW 4: Cumulative Cash Flow & Goal Completion -->
-  <article class="terminal-panel chart-panel half-span">
-    <div class="panel-head">
-      <div>
-        <p class="panel-kicker">CASH FLOW MATRIX</p>
-        <h2>Cumulative Cash Flow</h2>
-      </div>
-    </div>
-    {% if not charts.cumulative_cash_flow.has_data %}
-      <div class="chart-empty-state">
-        <p class="panel-kicker">NO CASH FLOW DATA</p>
-        <p class="muted">Add transactions to generate cumulative cash flow timeline.</p>
-      </div>
-    {% else %}
-      <canvas data-chart="line" data-x-title="Timeline" data-y-title="Cumulative Balance (₹)" data-payload='{{ charts.cumulative_cash_flow|tojson }}'></canvas>
-    {% endif %}
-  </article>
-
-  <article class="terminal-panel chart-panel half-span">
+  <!-- ROW 5: Target Metrics (Goals) -->
+  <article class="terminal-panel chart-panel full-span">
     <div class="panel-head">
       <div>
         <p class="panel-kicker">TARGET METRICS</p>
         <h2>Financial Goals Completion</h2>
       </div>
+      <a href="/goals">Manage Goals</a>
     </div>
     {% if not charts.goal_progress.has_data %}
       <div class="chart-empty-state">

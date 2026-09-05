@@ -16,7 +16,7 @@
   <article class="metric"><span>Monthly Income</span><strong>{{ dashboard.monthly_income|money(current_user.currency) }}</strong></article>
   <article class="metric"><span>Monthly Expense</span><strong>{{ dashboard.monthly_expense|money(current_user.currency) }}</strong></article>
   <article class="metric"><span>Remaining Budget</span><strong>{{ dashboard.remaining_budget|money(current_user.currency) }}</strong></article>
-  <article class="metric"><span>Savings</span><strong>{{ dashboard.savings|money(current_user.currency) }}</strong></article>
+  <article class="metric metric-primary"><span>Available Balance</span><strong class="good">{{ dashboard.available_balance|money(current_user.currency) }}</strong></article>
 </section>
 
 <section class="dashboard-layout">

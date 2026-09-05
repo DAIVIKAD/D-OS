@@ -117,9 +117,9 @@
               <tbody>
                 {% for exp in custom.expenses %}
                 <tr>
-                  <td>{{ exp.note }}</td>
-                  <td><strong style="color: var(--red);">{{ exp.amount|money(current_user.currency) }}</strong></td>
-                  <td class="row-actions">
+                  <td data-label="Note">{{ exp.note }}</td>
+                  <td data-label="Amount"><strong style="color: var(--red);">{{ exp.amount|money(current_user.currency) }}</strong></td>
+                  <td data-label="Actions" class="row-actions">
                     <details>
                       <summary title="Edit" style="cursor: pointer; color: var(--green-dim);">✎</summary>
                       <form method="post" action="/budget/custom/{{ custom.id }}/expense/{{ exp.id }}/update" class="edit-grid" style="min-width: 220px;">
@@ -212,9 +212,9 @@
       <tbody>
       {% for category in categories %}
         <tr>
-          <td>{{ category.icon }} {{ category.name }}</td>
-          <td><strong style="color: #ffffff;">{{ category.monthly_budget|money(current_user.currency) }}</strong></td>
-          <td>
+          <td data-label="Category">{{ category.icon }} {{ category.name }}</td>
+          <td data-label="Monthly Target"><strong style="color: #ffffff;">{{ category.monthly_budget|money(current_user.currency) }}</strong></td>
+          <td data-label="Action">
             <form class="inline-form" method="post" action="/budget/category/{{ category.id }}">
               <input name="monthly_budget" type="number" min="0" step="any" value="{{ category.monthly_budget }}" style="max-width: 140px;">
               <button class="dos-btn ghost" type="submit">Save Target</button>

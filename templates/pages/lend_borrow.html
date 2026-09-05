@@ -81,12 +81,12 @@
       <tbody>
         {% for debt in debts %}
         <tr>
-          <td><strong>{{ debt.person_name }}</strong>{% if debt.note %}<small style="display:block; color: var(--muted);">{{ debt.note }}</small>{% endif %}</td>
-          <td>{{ debt.phone or '—' }}</td>
-          <td><span class="pill {{ 'income' if debt.direction == 'lend' else 'expense' }}">{{ 'LENT' if debt.direction == 'lend' else 'BORROWED' }}</span></td>
-          <td><strong style="color: #ffffff;">{{ debt.amount|money(current_user.currency) }}</strong></td>
-          <td>{{ debt.due_date|format_date if debt.due_date else '—' }}</td>
-          <td>
+          <td data-label="Person"><strong>{{ debt.person_name }}</strong>{% if debt.note %}<small style="display:block; color: var(--muted);">{{ debt.note }}</small>{% endif %}</td>
+          <td data-label="Phone">{{ debt.phone or '—' }}</td>
+          <td data-label="Type"><span class="pill {{ 'income' if debt.direction == 'lend' else 'expense' }}">{{ 'LENT' if debt.direction == 'lend' else 'BORROWED' }}</span></td>
+          <td data-label="Amount"><strong style="color: #ffffff;">{{ debt.amount|money(current_user.currency) }}</strong></td>
+          <td data-label="Due Date">{{ debt.due_date|format_date if debt.due_date else '—' }}</td>
+          <td data-label="Status">
             <form method="post" action="/lend-borrow/{{ debt.id }}/status" class="inline-form">
               <select name="status">
                 <option value="pending" {% if debt.status == 'pending' %}selected{% endif %}>Pending</option>
@@ -95,7 +95,7 @@
               <button class="dos-btn ghost" style="padding: 0.2rem 0.5rem; font-size: 0.9rem;">Save</button>
             </form>
           </td>
-          <td>
+          <td data-label="Action">
             <form method="post" action="/lend-borrow/{{ debt.id }}/delete" onsubmit="return confirm('Delete this record?');">
               <button class="link-danger" type="submit" title="Delete record">⌫</button>
             </form>

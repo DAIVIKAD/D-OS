@@ -51,6 +51,9 @@ def dashboard_api(user: dict = Depends(require_user)):
     data = prefetch_data(user)
     dash = dashboard_data(user, data)
     return {
+        "available_balance": as_float(dash["available_balance"]),
+        "total_income": as_float(dash["total_income"]),
+        "total_expense": as_float(dash["total_expense"]),
         "today_expense": as_float(dash["today_expense"]),
         "today_income": as_float(dash["today_income"]),
         "monthly_expense": as_float(dash["monthly_expense"]),

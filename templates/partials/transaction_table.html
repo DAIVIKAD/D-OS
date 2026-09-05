@@ -13,12 +13,12 @@
     <tbody>
       {% for tx in rows %}
       <tr>
-        <td>{{ tx.date|format_date }}</td>
-        <td><span class="pill {{ tx.type }}">{{ tx.type }}</span></td>
-        <td>{{ tx.category.icon if tx.category else "◇" }} {{ tx.category.name if tx.category else "Uncategorized" }}</td>
-        <td class="{{ 'good' if tx.type == 'income' else 'bad' }}">{{ tx.amount|money(current_user.currency) }}</td>
-        <td>{{ tx.note or tx.payment_method }}</td>
-        <td class="row-actions">
+        <td data-label="Date">{{ tx.date|format_date }}</td>
+        <td data-label="Type"><span class="pill {{ tx.type }}">{{ tx.type }}</span></td>
+        <td data-label="Category">{{ tx.category.icon if tx.category else "◇" }} {{ tx.category.name if tx.category else "Uncategorized" }}</td>
+        <td data-label="Amount" class="{{ 'good' if tx.type == 'income' else 'bad' }}">{{ tx.amount|money(current_user.currency) }}</td>
+        <td data-label="Note">{{ tx.note or tx.payment_method or "—" }}</td>
+        <td data-label="Actions" class="row-actions">
           <details>
             <summary title="Edit">✎</summary>
             <form method="post" action="/transactions/{{ tx.id }}/update" class="edit-grid">

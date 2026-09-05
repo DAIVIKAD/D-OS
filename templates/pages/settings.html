@@ -53,11 +53,11 @@
       <tbody>
       {% for category in categories %}
         <tr>
-          <td><span class="pill {{ category.kind }}">{{ category.kind|upper }}</span></td>
-          <td>{{ category.icon }} {{ category.name }}</td>
-          <td><span class="swatch" style="--swatch: {{ category.color }}"></span>{{ category.color }}</td>
-          <td>{{ category.monthly_budget|money(current_user.currency) }}</td>
-          <td>
+          <td data-label="Kind"><span class="pill {{ category.kind }}">{{ category.kind|upper }}</span></td>
+          <td data-label="Name">{{ category.icon }} {{ category.name }}</td>
+          <td data-label="Color"><span class="swatch" style="--swatch: {{ category.color }}"></span>{{ category.color }}</td>
+          <td data-label="Budget">{{ category.monthly_budget|money(current_user.currency) }}</td>
+          <td data-label="Action" class="row-actions">
             <details>
               <summary>✎</summary>
               <form class="edit-grid" method="post" action="/settings/categories/{{ category.id }}">

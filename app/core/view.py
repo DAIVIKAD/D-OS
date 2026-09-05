@@ -11,6 +11,7 @@ NAV_ITEMS = [
     ("Budget", "/budget", "▤"),
     ("Lend & Borrow", "/lend-borrow", "⇄"),
     ("Reports", "/reports", "▧"),
+    ("More", "/more", "☰"),
 ]
 
 
