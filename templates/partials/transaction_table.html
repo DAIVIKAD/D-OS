@@ -1,3 +1,10 @@
+<div class="filter-count-banner" style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.75rem; background: rgba(102, 255, 153, 0.05); border: 1px dashed var(--line); border-radius: 4px; margin-bottom: 0.75rem;">
+  <span class="panel-kicker" style="color: var(--green); font-size: 0.95rem;">
+    Showing {{ filtered_count|default(rows|length) }} of {{ total_count|default(rows|length) }} transactions
+  </span>
+  <span class="muted" style="font-size: 0.85rem;">Ledger Synchronized</span>
+</div>
+
 <div class="table-wrap">
   <table class="terminal-table">
     <thead>

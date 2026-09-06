@@ -40,7 +40,15 @@
       <p class="panel-kicker">SYSTEM STATUS // MONEY ENGINE INSIGHTS</p>
       <h2>INTELLIGENCE LOG</h2>
     </div>
-    <span class="blink">█</span>
+    <span class="ninja-icon-pulse" title="Intelligence Monitor Active" aria-label="Intelligence Monitor">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a9 9 0 0 0-9 9c0 4.1 2.8 7.6 6.6 8.7L10 22h4l.4-2.3c3.8-1.1 6.6-4.6 6.6-8.7a9 9 0 0 0-9-9z"/>
+        <path d="M4 10h16"/>
+        <path d="M4 14h16"/>
+        <circle cx="8.5" cy="12" r="1" fill="currentColor"/>
+        <circle cx="15.5" cy="12" r="1" fill="currentColor"/>
+      </svg>
+    </span>
   </div>
   <div class="smart-insights-list">
     {% for insight in smart_insights %}

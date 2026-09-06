@@ -368,8 +368,14 @@
           requestType: "DOWNLOAD"
         });
 
-        fetch(href, { credentials: "same-origin" })
+        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+        const downloadTimeout = setTimeout(function () {
+          if (controller) controller.abort();
+        }, 15000);
+
+        fetch(href, { credentials: "same-origin", signal: controller ? controller.signal : undefined })
           .then(function (response) {
+            clearTimeout(downloadTimeout);
             if (!response.ok) throw new Error("EXPORT FAILED");
             const disposition = response.headers.get("Content-Disposition") || "";
             const match = disposition.match(/filename="?([^"]+)"?/i);
@@ -384,13 +390,22 @@
             const temp = document.createElement("a");
             temp.href = url;
             temp.download = file.filename;
+            temp.setAttribute("download", file.filename);
+            temp.setAttribute("data-download", "true");
+            temp.style.display = "none";
+            temp.addEventListener("click", function (e) {
+              e.stopPropagation();
+            });
             document.body.appendChild(temp);
             temp.click();
             temp.remove();
-            URL.revokeObjectURL(url);
+            setTimeout(function () {
+              URL.revokeObjectURL(url);
+            }, 1000);
             self.complete(opId, "EXPORT READY");
           })
           .catch(function () {
+            clearTimeout(downloadTimeout);
             self.fail(opId, "EXPORT FAILED");
           })
           .finally(function () {
@@ -414,9 +429,9 @@
       document.addEventListener("click", function (evt) {
         const anchor = evt.target.closest("a[href]");
         if (!anchor) return;
-        if (anchor.hasAttribute("data-download")) return;
+        if (anchor.hasAttribute("data-download") || anchor.hasAttribute("download")) return;
         const href = anchor.getAttribute("href");
-        if (!href || href.startsWith("#") || href.startsWith("javascript:") || anchor.target === "_blank") {
+        if (!href || href.startsWith("#") || href.startsWith("javascript:") || href.startsWith("blob:") || href.startsWith("data:") || anchor.target === "_blank") {
           return;
         }
         if (href === window.location.pathname) return;
@@ -445,6 +460,19 @@
       document.body.addEventListener("htmx:beforeRequest", function (evt) {
         const el = evt.detail.elt;
         const form = el.tagName === "FORM" ? el : el.closest("form");
+
+        // Suppress screen-level Activity HUD for search/filter operations to keep them smooth
+        const isFilterOrSearch = form && (
+          form.classList.contains("filter-row") ||
+          form.classList.contains("ledger-filter-panel") ||
+          form.classList.contains("report-filter-form") ||
+          form.hasAttribute("data-no-hud") ||
+          form.classList.contains("global-search")
+        );
+        if (isFilterOrSearch) {
+          return;
+        }
+
         const submitBtn = form ? form.querySelector('button[type="submit"], input[type="submit"]') : null;
         if (form && form.dataset.submitting === "true") {
           evt.preventDefault();
@@ -503,6 +531,7 @@
     start: function (opId, options) {
       options = options || {};
       const now = Date.now();
+      const self = this;
       const op = {
         id: opId,
         message: options.message || "SYSTEM ACTIVITY IN PROGRESS...",
@@ -514,6 +543,14 @@
         form: options.form || null,
         requestType: options.requestType || "ASYNC"
       };
+
+      // Watchdog timeout guarantees NO loader can ever hang indefinitely on screen
+      op.safetyTimeout = setTimeout(function () {
+        if (self.activeOps[opId]) {
+          console.warn("ActivityManager auto-clearing timed-out op:", opId);
+          self.complete(opId);
+        }
+      }, 15000);
 
       this.activeOps[opId] = op;
       this._recordDebug(op, "STARTED");
@@ -530,6 +567,11 @@
     complete: function (opId, successMsg) {
       const op = this.activeOps[opId];
       if (!op) return;
+
+      if (op.safetyTimeout) {
+        clearTimeout(op.safetyTimeout);
+        op.safetyTimeout = null;
+      }
 
       if (op.btn && op.form) {
         op.form.dataset.submitting = "false";
@@ -555,6 +597,11 @@
     fail: function (opId, errorMsg) {
       const op = this.activeOps[opId];
       if (!op) return;
+
+      if (op.safetyTimeout) {
+        clearTimeout(op.safetyTimeout);
+        op.safetyTimeout = null;
+      }
 
       if (op.btn && op.form) {
         op.form.dataset.submitting = "false";

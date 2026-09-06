@@ -4,33 +4,199 @@
   <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
     <div>
       <p class="panel-kicker">SYSTEM STATUS // FINANCIAL REPORT ENGINE</p>
-      <h1>REPORTS &amp; PDF</h1>
-      <p class="muted" style="margin-top: 0.25rem;">Monthly and category financial reports and CSV/PDF export.</p>
+      <h1>REPORTS &amp; STATEMENTS</h1>
+      <p class="muted" style="margin-top: 0.25rem;">Configurable financial statement builder with on-page preview and PDF/CSV export.</p>
     </div>
     <a href="/more" class="dos-btn ghost" style="font-size: 1rem; padding: 0.35rem 0.75rem;">← Back to More</a>
   </div>
   <div class="ascii-divider" aria-hidden="true">──────────────────────────────────────────────────────────────────────────────────────────</div>
 </div>
 
-<section class="metric-grid compact">
-  <article class="metric"><span>Monthly Income</span><strong>{{ dashboard.monthly_income|money(current_user.currency) }}</strong></article>
-  <article class="metric"><span>Monthly Expense</span><strong>{{ dashboard.monthly_expense|money(current_user.currency) }}</strong></article>
-  <article class="metric"><span>Remaining Budget</span><strong>{{ dashboard.remaining_budget|money(current_user.currency) }}</strong></article>
-  <article class="metric metric-primary"><span>Available Balance</span><strong class="good">{{ dashboard.available_balance|money(current_user.currency) }}</strong></article>
+<!-- 1. REPORT BUILDER CONTROLS -->
+<section class="terminal-panel" style="margin-bottom: 1.5rem;">
+  <div class="panel-head">
+    <div>
+      <p class="panel-kicker">CONFIGURATION</p>
+      <h2>REPORT BUILDER</h2>
+    </div>
+  </div>
+  <form id="report-builder-form" class="report-filter-form" method="get" action="/reports" data-no-hud="true">
+    <div class="form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem; align-items: end;">
+      <label>Date From
+        <input type="date" name="start" value="{{ report.start_date.isoformat() }}">
+      </label>
+      <label>Date To
+        <input type="date" name="end" value="{{ report.end_date.isoformat() }}">
+      </label>
+      <label>Transaction Type
+        <select name="type">
+          <option value="all" {% if report.type_filter == 'all' %}selected{% endif %}>All Types</option>
+          <option value="expense" {% if report.type_filter == 'expense' %}selected{% endif %}>Expenses Only</option>
+          <option value="income" {% if report.type_filter == 'income' %}selected{% endif %}>Income Only</option>
+        </select>
+      </label>
+      <label>Category
+        <select name="category_id">
+          <option value="all" {% if report.category_id == 'all' %}selected{% endif %}>All Categories</option>
+          {% for cat in report.all_categories %}
+            <option value="{{ cat.id }}" {% if report.category_id == cat.id %}selected{% endif %}>{{ cat.icon }} {{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Payment Method / Account
+        <select name="payment_method">
+          <option value="all" {% if report.payment_method == 'all' %}selected{% endif %}>All Methods</option>
+          {% for pm in report.all_payment_methods %}
+            <option value="{{ pm }}" {% if report.payment_method == pm %}selected{% endif %}>{{ pm }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <!-- Quick Date Presets -->
+    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--line-dim);">
+      <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;">
+        <span class="panel-kicker" style="font-size: 0.85rem; margin-right: 0.25rem;">QUICK PERIOD:</span>
+        <button type="button" class="dos-btn ghost sm" data-period-preset="this-month">This Month</button>
+        <button type="button" class="dos-btn ghost sm" data-period-preset="last-month">Last Month</button>
+        <button type="button" class="dos-btn ghost sm" data-period-preset="last-90">Last 90 Days</button>
+        <button type="button" class="dos-btn ghost sm" data-period-preset="this-year">This Year</button>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <a href="/reports" class="dos-btn ghost sm" style="text-decoration: none;">[ RESET ]</a>
+        <button type="submit" class="dos-btn primary sm">[ GENERATE REPORT ]</button>
+      </div>
+    </div>
+  </form>
 </section>
 
-<section class="dashboard-layout">
-  <article class="terminal-panel">
-    <div class="panel-head"><div><p class="panel-kicker">Exports</p><h2>Reports</h2></div></div>
-    <div class="quick-actions large">
-      <a href="/reports/export.csv" data-download data-op-name="EXPORTING MONEY CSV...">CSV Money</a>
-      <a href="/reports/export.csv?kind=income" data-download data-op-name="EXPORTING INCOME CSV...">CSV Income</a>
-      <a href="/reports/export.csv?kind=expense" data-download data-op-name="EXPORTING EXPENSE CSV...">CSV Expense</a>
-      <a href="/reports/export.pdf" data-download data-op-name="GENERATING PDF REPORT...">PDF Report</a>
+<!-- 2. ON-PAGE REPORT PREVIEW -->
+<section class="terminal-panel" style="margin-bottom: 1.5rem; border: 1px solid var(--green); box-shadow: 0 0 10px rgba(102, 255, 153, 0.12);">
+  <div class="panel-head" style="flex-wrap: wrap; gap: 0.75rem;">
+    <div>
+      <p class="panel-kicker">ON-PAGE STATEMENT PREVIEW // D-OS AUDIT</p>
+      <h2>STATEMENT PREVIEW</h2>
+      <p class="muted" style="font-size: 0.95rem; margin-top: 0.2rem;">
+        Period: <strong style="color: var(--green);">{{ report.period_str }}</strong> &nbsp;|&nbsp;
+        Type: <span class="pill {{ report.type_filter }}">{{ report.type_filter|upper }}</span> &nbsp;|&nbsp;
+        Records: <strong style="color: var(--green);">{{ report.transaction_count }}</strong>
+      </p>
     </div>
-  </article>
-  <article class="terminal-panel">
-    <div class="panel-head"><div><p class="panel-kicker">Monthly</p><h2>Comparison</h2></div></div>
+    <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+      <a href="/reports/export.pdf?start={{ report.start_date.isoformat() }}&end={{ report.end_date.isoformat() }}&type={{ report.type_filter }}&category_id={{ report.category_id }}&payment_method={{ report.payment_method }}"
+         class="dos-btn primary" data-download data-op-name="GENERATING PDF STATEMENT..." style="font-size: 0.95rem;">
+        ▧ DOWNLOAD PDF
+      </a>
+      <a href="/reports/export.csv?start={{ report.start_date.isoformat() }}&end={{ report.end_date.isoformat() }}&type={{ report.type_filter }}&category_id={{ report.category_id }}&payment_method={{ report.payment_method }}"
+         class="dos-btn ghost" data-download data-op-name="EXPORTING FILTERED CSV..." style="font-size: 0.95rem;">
+        ▥ DOWNLOAD CSV
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI METRICS SUMMARY -->
+  <div class="metric-grid compact" style="margin-bottom: 1.25rem;">
+    <article class="metric metric-primary">
+      <span>Available Balance (Period)</span>
+      <strong class="{{ 'good' if report.available_balance >= 0 else 'bad' }}">
+        {{ report.available_balance|money(report.currency) }}
+      </strong>
+    </article>
+    <article class="metric">
+      <span>Total Inflow (Income)</span>
+      <strong class="good">{{ report.total_income|money(report.currency) }}</strong>
+    </article>
+    <article class="metric">
+      <span>Total Outflow (Expenses)</span>
+      <strong class="bad">{{ report.total_expense|money(report.currency) }}</strong>
+    </article>
+    <article class="metric">
+      <span>Debt Repayments Settled</span>
+      <strong>{{ report.total_repayments|money(report.currency) }}</strong>
+    </article>
+  </div>
+
+  <!-- Movement & Liabilities Sub-Strip -->
+  <div style="display: flex; flex-wrap: wrap; gap: 1rem; padding: 0.75rem 1rem; background: rgba(102, 255, 153, 0.04); border: 1px dashed var(--line); border-radius: 4px; margin-bottom: 1.25rem; font-size: 0.95rem;">
+    <div><span class="panel-kicker">BORROWED (LIABILITY):</span> <strong>{{ report.total_borrowed|money(report.currency) }}</strong></div>
+    <div><span class="panel-kicker">LENT (RECEIVABLE):</span> <strong>{{ report.total_lent|money(report.currency) }}</strong></div>
+    <div><span class="panel-kicker">TRANSFERS:</span> <strong>{{ report.total_transfers|money(report.currency) }}</strong></div>
+    <div><span class="panel-kicker">MATCHING TX COUNT:</span> <strong>{{ report.transaction_count }}</strong></div>
+  </div>
+
+  <!-- CATEGORY BREAKDOWN SECTION -->
+  {% if report.category_breakdown %}
+  <div style="margin-bottom: 1.5rem;">
+    <div class="panel-head" style="margin-bottom: 0.5rem;">
+      <p class="panel-kicker">CATEGORY BREAKDOWN FOR PERIOD</p>
+    </div>
+    <div class="table-wrap">
+      <table class="terminal-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Count</th>
+            <th>Total Amount</th>
+            <th>Share (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in report.category_breakdown %}
+          <tr>
+            <td>{{ c.icon }} {{ c.name }}</td>
+            <td>{{ c.count }}</td>
+            <td class="good">{{ c.amount|money(report.currency) }}</td>
+            <td><strong>{{ c.pct }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- MATCHING TRANSACTIONS TABLE -->
+  <div>
+    <div class="panel-head" style="margin-bottom: 0.5rem;">
+      <p class="panel-kicker">MATCHING TRANSACTIONS ({{ report.transaction_count }})</p>
+    </div>
+    <div class="table-wrap">
+      <table class="terminal-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th>Payment Method</th>
+            <th>Amount</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tx in report.matching_transactions %}
+          <tr>
+            <td>{{ tx.date|format_date }}</td>
+            <td><span class="pill {{ tx.type }}">{{ tx.type }}</span></td>
+            <td>{{ tx.category.icon if tx.category else "◇" }} {{ tx.category.name if tx.category else "Uncategorized" }}</td>
+            <td>{{ tx.payment_method or "—" }}</td>
+            <td class="{{ 'good' if tx.type == 'income' else 'bad' }}">{{ tx.amount|money(report.currency) }}</td>
+            <td>{{ tx.note or "—" }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="empty-cell">No transactions found matching configured criteria.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 3. ANALYTICAL COMPARISONS & CHARTS -->
+<section class="chart-grid two">
+  <article class="terminal-panel chart-panel">
+    <div class="panel-head"><div><p class="panel-kicker">Monthly</p><h2>Expense Comparison</h2></div></div>
     {% if not charts.monthly_comparison.has_data %}
       <div class="chart-empty-state">
         <p class="panel-kicker">INSUFFICIENT MONTHLY DATA</p>
@@ -38,20 +204,6 @@
       </div>
     {% else %}
       <canvas data-chart="bar" data-x-title="Month" data-y-title="Expense ({{ current_user.currency }})" data-payload='{{ charts.monthly_comparison|tojson }}'></canvas>
-    {% endif %}
-  </article>
-</section>
-
-<section class="chart-grid two">
-  <article class="terminal-panel chart-panel">
-    <div class="panel-head"><div><p class="panel-kicker">Yearly</p><h2>Expense Comparison</h2></div></div>
-    {% if not charts.yearly_comparison.has_data %}
-      <div class="chart-empty-state">
-        <p class="panel-kicker">NO YEARLY EXPENSE DATA</p>
-        <p class="muted">Yearly comparison appears after real expense records are available.</p>
-      </div>
-    {% else %}
-      <canvas data-chart="bar" data-x-title="Year" data-y-title="Expense ({{ current_user.currency }})" data-payload='{{ charts.yearly_comparison|tojson }}'></canvas>
     {% endif %}
   </article>
   <article class="terminal-panel chart-panel">
@@ -66,4 +218,43 @@
     {% endif %}
   </article>
 </section>
+
+<script>
+(function() {
+  document.querySelectorAll("[data-period-preset]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      const preset = btn.getAttribute("data-period-preset");
+      const form = document.getElementById("report-builder-form");
+      if (!form) return;
+      const startInput = form.querySelector('input[name="start"]');
+      const endInput = form.querySelector('input[name="end"]');
+      if (!startInput || !endInput) return;
+
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const formatDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+      let start, end;
+      if (preset === "this-month") {
+        start = new Date(now.getFullYear(), now.getMonth(), 1);
+        end = now;
+      } else if (preset === "last-month") {
+        start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        end = new Date(now.getFullYear(), now.getMonth(), 0);
+      } else if (preset === "last-90") {
+        start = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+        end = now;
+      } else if (preset === "this-year") {
+        start = new Date(now.getFullYear(), 0, 1);
+        end = now;
+      }
+
+      if (start && end) {
+        startInput.value = formatDate(start);
+        endInput.value = formatDate(end);
+      }
+    });
+  });
+})();
+</script>
 {% endblock %}

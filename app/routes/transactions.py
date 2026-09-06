@@ -26,7 +26,10 @@ def _money_page(
     category_id: str | None,
     start: str | None,
     end: str | None,
+    payment_method: str | None = None,
 ):
+    all_user_txs = store.list_transactions(str(user["uid"]))
+    total_count = len(all_user_txs)
     rows = transaction_query(
         user,
         kind=kind,
@@ -34,6 +37,7 @@ def _money_page(
         category_id=category_id,
         start=optional_date(start),
         end=optional_date(end),
+        payment_method=payment_method,
     )
     totals = {
         "income": sum(to_decimal(tx.get("amount")) for tx in rows if tx.get("type") == "income"),
@@ -48,6 +52,8 @@ def _money_page(
             page_title=page_title,
             kind=kind,
             rows=rows,
+            total_count=total_count,
+            filtered_count=len(rows),
             categories=get_categories(user, kind),
             all_categories=get_categories(user),
             totals=totals,
@@ -56,6 +62,7 @@ def _money_page(
                 "category_id": category_id or "",
                 "start": start or "",
                 "end": end or "",
+                "payment_method": payment_method or "",
             },
         ),
     )
@@ -73,9 +80,10 @@ def money_page(
     category_id: str | None = None,
     start: str | None = None,
     end: str | None = None,
+    payment_method: str | None = None,
     user: dict = Depends(require_user),
 ):
-    return _money_page(request, user, None, "Money", search, category_id, start, end)
+    return _money_page(request, user, None, "Money", search, category_id, start, end, payment_method)
 
 
 @router.get("/income")
@@ -85,9 +93,10 @@ def income_page(
     category_id: str | None = None,
     start: str | None = None,
     end: str | None = None,
+    payment_method: str | None = None,
     user: dict = Depends(require_user),
 ):
-    return _money_page(request, user, "income", "Income", search, category_id, start, end)
+    return _money_page(request, user, "income", "Income", search, category_id, start, end, payment_method)
 
 
 @router.get("/expenses")
@@ -97,9 +106,10 @@ def expenses_page(
     category_id: str | None = None,
     start: str | None = None,
     end: str | None = None,
+    payment_method: str | None = None,
     user: dict = Depends(require_user),
 ):
-    return _money_page(request, user, "expense", "Expenses", search, category_id, start, end)
+    return _money_page(request, user, "expense", "Expenses", search, category_id, start, end, payment_method)
 
 
 @router.post("/transactions")

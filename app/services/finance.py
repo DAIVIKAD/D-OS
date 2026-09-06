@@ -309,17 +309,22 @@ def transaction_query(
     category_id: str | None = None,
     start: date | None = None,
     end: date | None = None,
+    payment_method: str | None = None,
 ) -> list[dict[str, Any]]:
     rows = store.list_transactions(uid_of(user), kind=kind)
     filtered: list[dict[str, Any]] = []
     for row in rows:
-        if category_id and row.get("category_id") != category_id:
+        if category_id and category_id != "all" and row.get("category_id") != category_id:
             continue
         row_date = tx_date(row)
         if start and row_date < start:
             continue
         if end and row_date > end:
             continue
+        if payment_method and payment_method != "all":
+            pm_needle = payment_method.strip().lower()
+            if pm_needle and pm_needle not in str(row.get("payment_method", "")).lower():
+                continue
         filtered.append(row)
     if search:
         needle = search.lower()

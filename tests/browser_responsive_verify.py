@@ -190,6 +190,7 @@ def start_test_server(port=8765):
     p5 = patch("app.services.firestore_service.list_recurring", return_value=MOCK_RECURRING)
     p6 = patch("app.services.firestore_service.list_investments", return_value=MOCK_INVESTMENTS)
     p7 = patch("app.services.firestore_service.list_custom_budgets", return_value=MOCK_CUSTOM_BUDGETS)
+    p8 = patch("app.services.firestore_service.log_report")
 
     p1.start()
     p2.start()
@@ -198,6 +199,7 @@ def start_test_server(port=8765):
     p5.start()
     p6.start()
     p7.start()
+    p8.start()
 
     config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning")
     server = uvicorn.Server(config)

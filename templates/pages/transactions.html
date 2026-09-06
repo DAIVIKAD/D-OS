@@ -79,18 +79,49 @@
       <span>Expense {{ totals.expense|money(current_user.currency) }}</span>
     </div>
   </div>
-  <form class="filter-row" method="get" hx-get="{{ active_path }}" hx-trigger="input changed delay:180ms" hx-target="#transaction-results">
-    <input name="search" type="search" value="{{ filters.search }}" placeholder="Search note, category, method">
-    <select name="category_id">
-      <option value="">All categories</option>
-      {% for category in categories %}
-        <option value="{{ category.id }}" {% if filters.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
-      {% endfor %}
-    </select>
-    <input name="start" type="date" value="{{ filters.start }}">
-    <input name="end" type="date" value="{{ filters.end }}">
-    <button type="submit">Filter</button>
-    <a href="/reports/export.csv{% if kind %}?kind={{ kind }}{% endif %}" data-download data-op-name="EXPORTING LEDGER CSV...">CSV</a>
+  <!-- Dedicated Filter Panel -->
+  <form class="ledger-filter-panel filter-row" method="get" action="{{ active_path }}" hx-get="{{ active_path }}" hx-trigger="change, input changed delay:220ms" hx-target="#transaction-results" data-no-hud="true" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.25rem; background: rgba(102, 255, 153, 0.03); padding: 0.85rem; border: 1px dashed var(--line); border-radius: 4px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; align-items: end;">
+      <label>Search
+        <input name="search" type="search" value="{{ filters.search }}" placeholder="Note, category, method">
+      </label>
+      <label>Date From
+        <input name="start" type="date" value="{{ filters.start }}">
+      </label>
+      <label>Date To
+        <input name="end" type="date" value="{{ filters.end }}">
+      </label>
+      {% if not kind %}
+      <label>Type
+        <select name="type_switch" onchange="if(this.value){window.location.href=this.value;}">
+          <option value="/money" selected>All Transactions</option>
+          <option value="/income">Income Only</option>
+          <option value="/expenses">Expenses Only</option>
+        </select>
+      </label>
+      {% endif %}
+      <label>Category
+        <select name="category_id">
+          <option value="">All categories</option>
+          {% for category in categories %}
+            <option value="{{ category.id }}" {% if filters.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Payment Method
+        <input name="payment_method" value="{{ filters.payment_method }}" placeholder="UPI, Cash, Card...">
+      </label>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-top: 1px dashed var(--line-dim); padding-top: 0.5rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button type="submit" class="dos-btn primary sm">[ APPLY FILTER ]</button>
+        <a href="{{ active_path }}" class="dos-btn ghost sm" style="text-decoration: none;">[ CLEAR ]</a>
+      </div>
+      <a href="/reports/export.csv{% if kind %}?kind={{ kind }}{% endif %}" class="dos-btn ghost sm" data-download data-op-name="EXPORTING LEDGER CSV..." style="font-size: 0.9rem;">
+        ▥ Export CSV
+      </a>
+    </div>
   </form>
   <div id="transaction-results">
     {% include "partials/transaction_table.html" %}

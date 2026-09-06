@@ -34,6 +34,7 @@ class TestFeatureRoutesAndAuth(unittest.TestCase):
     @patch("app.services.firestore_service.list_recurring", return_value=[])
     @patch("app.services.firestore_service.list_investments", return_value=[])
     @patch("app.services.firestore_service.list_custom_budgets", return_value=[])
+    @patch("app.services.firestore_service.log_report")
     def test_all_matrix_routes_render_ok(self, *mocks):
         routes_to_test = [
             ("/", "Dashboard"),
@@ -60,6 +61,16 @@ class TestFeatureRoutesAndAuth(unittest.TestCase):
             # Ensure no horizontal scroll or desktop minimum overflow triggers
             html = response.text
             self.assertIn("D-OS", html)
+
+        # Test Filtered Reports exports with mock session
+        csv_resp = client.get("/reports/export.csv", cookies={"dos_session": "mock_valid_session"})
+        self.assertEqual(csv_resp.status_code, 200)
+        self.assertIn("Date,Type,Category,Amount", csv_resp.text)
+
+        pdf_resp = client.get("/reports/export.pdf", cookies={"dos_session": "mock_valid_session"})
+        self.assertEqual(pdf_resp.status_code, 200)
+        self.assertEqual(pdf_resp.headers.get("content-type"), "application/pdf")
+        self.assertGreater(len(pdf_resp.content), 500)
 
     def test_public_login_page(self):
         response = client.get("/login")

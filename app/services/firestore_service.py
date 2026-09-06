@@ -163,7 +163,10 @@ def list_wishlist(uid: str) -> list[dict[str, Any]]:
 
 
 def log_report(uid: str, report_type: str) -> None:
-    create_record(uid, REPORTS, {"type": report_type})
+    try:
+        create_record(uid, REPORTS, {"type": report_type})
+    except Exception:
+        pass
 
 
 def list_custom_budgets(uid: str) -> list[dict[str, Any]]:
